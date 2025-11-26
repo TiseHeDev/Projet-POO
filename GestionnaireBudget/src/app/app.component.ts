@@ -1,11 +1,13 @@
-import { Component, signal } from '@angular/core';
+// src/app/app.component.ts
+
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.html',
-  standalone: false,
-  styleUrl: './app.css'
+  templateUrl: './app.component.html',
+  // [IMPORTANT] Assurez-vous que cette ligne n'existe PAS : standalone: true,
+  // [IMPORTANT] Assurez-vous que l'array imports: [] n'existe PAS
 })
-export class App {
-  protected readonly title = signal('GestionnaireBudget');
+export class AppComponent { // 👈 DOIT AVOIR 'export'
+  title = 'GestionnaireBudget';
 }
