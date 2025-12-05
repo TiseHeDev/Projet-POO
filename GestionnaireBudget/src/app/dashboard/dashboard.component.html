@@ -1,0 +1,41 @@
+<div class="dashboard-container">
+    <h3>Synthèse du Budget</h3>
+
+    <div 
+      class="solde-box" 
+      [style.background-color]="summary.estDansLeVert ? '#d4edda' : '#f8d7da'"
+      [style.color]="summary.estDansLeVert ? '#155724' : '#721c24'"
+      style="padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+
+      <h4>Solde Actuel :</h4>
+      <h1>{{ summary.solde | currency:'EUR':'symbol':'1.2-2':'fr' }}</h1> 
+    </div>
+
+    <div style="display: flex; justify-content: space-around;">
+        <p>Revenus Totaux : 
+            <strong style="color: green;">{{ summary.revenusTotal | currency:'EUR':'symbol':'1.2-2':'fr' }}</strong>
+        </p>
+        <p>Dépenses Totales : 
+            <strong style="color: red;">{{ summary.depensesTotal | currency:'EUR':'symbol':'1.2-2':'fr' }}</strong>
+        </p>
+    </div>
+
+    <hr>
+    <h4>🏆 Top 3 des Dépenses</h4>
+    <ul *ngIf="top3Depenses.length > 0; else noExpenses">
+      <li *ngFor="let depense of top3Depenses">
+        **{{ depense.categorie }}**: 
+        {{ depense.montant | currency:'EUR':'symbol':'1.2-2':'fr' }} 
+        ({{ depense.description }})
+      </li>
+    </ul>
+    <ng-template #noExpenses>
+        <p>Ajoutez des dépenses pour voir le classement.</p>
+    </ng-template>
+
+    <hr>
+    <h4>📈 Répartition des Dépenses</h4>
+    <div style="height: 200px; border: 1px dashed #ccc; padding: 10px; display: flex; align-items: center; justify-content: center;">
+        (Le graphique en camembert sera ajouté ici)
+    </div>
+</div>
