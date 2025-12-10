@@ -4,10 +4,13 @@
 
 <main class="content-wrapper">
   
+
+  
   <section class="dashboard-area full-width">
     <app-dashboard 
       (editTransaction)="onEditRequest($event)"
-      (addTransaction)="onAddRequest()"> </app-dashboard>
+      (addTransaction)="onAddRequest()"
+      (manageCategories)="openCategoryModal()"> </app-dashboard>
   </section>
   
   <div class="modal-backdrop" *ngIf="isModalOpen">
@@ -19,6 +22,14 @@
         (formSubmitted)="clearEditState()"
         (formCancelled)="clearEditState()">
       </app-transaction-form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="isCategoryModalOpen">
+    <div class="modal-content large-modal"> 
+      <button class="close-modal" (click)="closeCategoryModal()">X</button>
+      
+      <app-category-manager></app-category-manager>
     </div>
   </div>
   

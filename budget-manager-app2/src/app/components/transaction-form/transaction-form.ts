@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { BudgetService } from '../../services/budget.service';
 import { CommonModule } from '@angular/common';
 import { Transaction } from '../../models/transaction.model';
+import { Observable } from 'rxjs'; 
 
 @Component({
   selector: 'app-transaction-form',
@@ -16,11 +17,10 @@ import { Transaction } from '../../models/transaction.model';
 export class TransactionForm implements OnInit, OnChanges {
   transactionForm: FormGroup;
 
-  private BASE_CATEGORIES: string[] = ['Nourriture', 'Logement', 'Transport', 'Loisirs', 'Santé', 'Salaire', 'Autre'];
   private BASE_METHODS: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque'];
   
-  categories: string[] = []; 
-  methods: string[] = [];
+  categories$!: Observable<string[]>; // Remplacé par Observable
+  methods: string[] = [];   
   
   @Input() transactionToEdit: Transaction | null = null;
   @Output() formSubmitted = new EventEmitter<void>();
@@ -43,7 +43,10 @@ export class TransactionForm implements OnInit, OnChanges {
   }
   
   ngOnInit(): void {
-    this.updateLists();
+    // Lie l'Observable du service à la propriété locale
+    this.categories$ = this.budgetService.categories$;
+    
+    this.updateMethods();
   }
   
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,17 +61,14 @@ export class TransactionForm implements OnInit, OnChanges {
           amount: this.transactionToEdit.amount,
           description: this.transactionToEdit.description
         });
-        this.updateLists(); 
+        this.updateMethods(); 
       } else {
         this.resetForm();
       }
     }
   }
 
-  private updateLists(): void {
-      const existingCategories = this.budgetService.getAllCategories();
-      this.categories = [...new Set([...this.BASE_CATEGORIES, ...existingCategories])].sort();
-      
+  private updateMethods(): void {
       const existingMethods = this.budgetService.getAllMethods();
       this.methods = [...new Set([...this.BASE_METHODS, ...existingMethods])].sort();
   }
@@ -101,8 +101,8 @@ export class TransactionForm implements OnInit, OnChanges {
         this.formSubmitted.emit(); 
       } else {
         this.budgetService.addTransaction(transactionData);
-        alert('Transaction ajoutée et stockée localement !');
-        this.updateLists(); 
+        alert('Transaction ajoutée !');
+        this.updateMethods(); 
       }
       
       this.resetForm();

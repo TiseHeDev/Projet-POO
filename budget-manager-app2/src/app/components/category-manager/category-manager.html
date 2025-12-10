@@ -1,0 +1,28 @@
+<div class="category-manager-card card">
+    <h3>⚙️ Gestion des Catégories</h3>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div class="add-category-form">
+        <input 
+            type="text" 
+            [(ngModel)]="newCategory" 
+            (keyup.enter)="addCategory()"
+            placeholder="Nom de la nouvelle catégorie"
+            maxlength="30"
+        >
+        <button (click)="addCategory()" [disabled]="!newCategory.trim()">Ajouter</button>
+    </div>
+
+    <div class="category-list-container">
+        <h4>Catégories existantes:</h4>
+        <ul *ngIf="categories$ | async as categories" class="category-list">
+            <li *ngFor="let cat of categories">
+                <span>{{ cat }}</span>
+                <button (click)="deleteCategory(cat)" class="delete-cat-button">X</button>
+            </li>
+        </ul>
+    </div>
+</div>

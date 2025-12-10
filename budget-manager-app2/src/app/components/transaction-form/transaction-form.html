@@ -29,7 +29,7 @@
       <label for="category">Catégorie :</label>
       <select id="category" formControlName="category" required>
         <option value="" disabled>Choisir une catégorie...</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        <option *ngFor="let cat of (categories$ | async)" [value]="cat">{{ cat }}</option>
       </select>
     </div>
     

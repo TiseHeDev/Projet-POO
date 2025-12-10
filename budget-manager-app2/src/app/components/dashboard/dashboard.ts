@@ -14,7 +14,7 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables); 
 
-interface TopExpense {
+interface TopItem { // Renommage pour être générique (Revenu ou Dépense)
   category: string;
   totalAmount: number;
 }
@@ -31,20 +31,24 @@ type SortDirection = 'asc' | 'desc' | '';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
-  // ... (propriétés inchangées) ...
   filteredTransactions$!: Observable<Transaction[]>; 
   totalBalance$!: Observable<number>;
   balanceStatus$!: Observable<'vert' | 'rouge' | 'neutre'>;
-  top3Expenses$!: Observable<TopExpense[]>;
+  top3Expenses$!: Observable<TopItem[]>;
+  top3Revenues$!: Observable<TopItem[]>; // NOUVEAU: Top 3 Revenus
   
+  // Variables de Filtre
   selectedMonth: string = ''; 
   selectedCategory: string = '';
-  allCategories: string[] = [];
-
+  allCategories: string[] = []; 
+  
+  // --- Propriétés du Tri ---
   currentSortColumn: SortColumn = 'date'; 
   currentSortDirection: SortDirection = 'desc'; 
 
+  // --- Propriétés du Graphique ---
   showBalanceChart: boolean = false; 
+  
   public lineChartData!: ChartConfiguration['data']; 
   
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -61,7 +65,8 @@ export class Dashboard implements OnInit {
   public lineChartType: ChartType = 'line';
 
   @Output() editTransaction = new EventEmitter<Transaction>();
-  @Output() addTransaction = new EventEmitter<void>(); // NOUVEAU: Événement pour ajouter
+  @Output() addTransaction = new EventEmitter<void>();
+  @Output() manageCategories = new EventEmitter<void>(); 
 
   constructor(private budgetService: BudgetService) {
     this.lineChartData = {
@@ -71,7 +76,9 @@ export class Dashboard implements OnInit {
   }
 
   ngOnInit(): void {
-    this.allCategories = this.budgetService.getAllCategories();
+    this.budgetService.categories$.subscribe(categories => {
+        this.allCategories = categories;
+    });
 
     this.filteredTransactions$ = combineLatest([
         this.budgetService.transactions$
@@ -79,7 +86,7 @@ export class Dashboard implements OnInit {
         map(([transactions]) => {
             let filtered = transactions.slice();
             
-            // FILTRAGE
+            // 1. FILTRAGE
             if (this.selectedMonth) {
                 const [year, month] = this.selectedMonth.split('-');
                 filtered = filtered.filter(t => 
@@ -103,7 +110,7 @@ export class Dashboard implements OnInit {
         })
     );
     
-    // CALCUL DU SOLDE ET STATUT
+    // CALCUL DU SOLDE ET STATUT (inchangé)
     this.totalBalance$ = this.filteredTransactions$.pipe(
         map(transactions => 
             transactions.reduce((acc, t) => 
@@ -123,8 +130,26 @@ export class Dashboard implements OnInit {
     // TOP 3 DÉPENSES
     this.top3Expenses$ = this.filteredTransactions$.pipe(
         map(transactions => {
-            const expenses = transactions.filter(t => t.type === 'Dépense');
-            const categoryTotals = expenses.reduce((acc, t) => {
+            const items = transactions.filter(t => t.type === 'Dépense');
+            
+            const categoryTotals = items.reduce((acc, t) => {
+                acc[t.category] = (acc[t.category] || 0) + t.amount;
+                return acc;
+            }, {} as Record<string, number>);
+
+            return Object.keys(categoryTotals)
+                .map(category => ({ category, totalAmount: categoryTotals[category] }))
+                .sort((a, b) => b.totalAmount - a.totalAmount)
+                .slice(0, 3);
+        })
+    );
+
+    // NOUVEAU: TOP 3 REVENUS (Logique similaire)
+    this.top3Revenues$ = this.filteredTransactions$.pipe(
+        map(transactions => {
+            const items = transactions.filter(t => t.type === 'Revenu');
+            
+            const categoryTotals = items.reduce((acc, t) => {
                 acc[t.category] = (acc[t.category] || 0) + t.amount;
                 return acc;
             }, {} as Record<string, number>);
@@ -137,19 +162,11 @@ export class Dashboard implements OnInit {
     );
   }
   
-  // ... (sortTransactions, setSort, onDelete, exportData, etc. inchangées) ...
-
-  // NOUVEAU: Déclenche l'ouverture de la modale d'ajout via l'événement Output
-  openAddModal(): void {
-      this.addTransaction.emit();
-  }
-
-  // ... (autres méthodes inchangées)
   private sortTransactions(transactions: Transaction[], column: SortColumn, direction: SortDirection): void {
       if (!column || !direction) {
           return;
       }
-
+      
       transactions.sort((a, b) => {
           let aValue: any;
           let bValue: any;
@@ -249,6 +266,14 @@ export class Dashboard implements OnInit {
       };
 
       reader.readAsText(file);
+  }
+
+  openAddModal(): void {
+      this.addTransaction.emit();
+  }
+
+  openCategoryModal(): void {
+      this.manageCategories.emit();
   }
 
   applyFilters(): void {

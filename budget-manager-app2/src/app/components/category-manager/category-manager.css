@@ -1,0 +1,104 @@
+/* src/app/components/category-manager/category-manager.css */
+
+.category-manager-card {
+    padding: 25px; /* Augmenter le padding interne */
+    margin-bottom: 0; /* Retirer la marge en bas */
+    border: none; /* Retirer la bordure */
+    box-shadow: none; /* Retirer l'ombre */
+}
+
+.category-manager-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    font-size: 1.4em; /* Rendre le titre plus visible */
+}
+
+.error-message {
+    color: white;
+    background-color: #dc3545;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.add-category-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-category-form input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-category-form button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-category-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.category-list-container h4 {
+    font-size: 1em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.category-list {
+    list-style: none;
+    padding: 0;
+    max-height: 250px; 
+    overflow-y: auto; 
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.category-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid #f8f8f8;
+    background-color: #fafafa;
+}
+
+.category-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.category-list li:last-child {
+    border-bottom: none;
+}
+
+.delete-cat-button {
+    background: none;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.7em;
+    line-height: 1;
+    padding: 0;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.delete-cat-button:hover {
+    background-color: #dc3545;
+    color: white;
+}

@@ -11,25 +11,51 @@
   
   <div class="dashboard-grid">
     
-    <div class="top-expenses card">
-      <h3>🔥 Top 3 Dépenses</h3>
-      <ng-container *ngIf="top3Expenses$ | async as topExpenses">
-          <div *ngIf="topExpenses.length === 0" class="no-data">
-            Aucune dépense enregistrée (ou filtrée).
-          </div>
-          <ul>
-            <li *ngFor="let expense of topExpenses">
-              <strong>{{ expense.category }}:</strong> 
-              <span>{{ expense.totalAmount | number:'1.2-2' }} €</span>
-            </li>
-          </ul>
-      </ng-container>
-    </div>
-    
-    <div class="add-button-container">
-        <button class="add-transaction-button" (click)="openAddModal()">
-            + Ajouter une nouvelle Transaction
-        </button>
+    <div class="stats-control-zone">
+        
+        <div class="top-items-container">
+            
+            <div class="top-item-card card">
+                <h3>🔥 Top 3 Dépenses</h3>
+                <ng-container *ngIf="top3Expenses$ | async as topExpenses">
+                    <div *ngIf="topExpenses.length === 0" class="no-data">
+                        Aucune dépense enregistrée.
+                    </div>
+                    <ul>
+                        <li *ngFor="let expense of topExpenses">
+                            <strong>{{ expense.category }}:</strong> 
+                            <span>{{ expense.totalAmount | number:'1.2-2' }} €</span>
+                        </li>
+                    </ul>
+                </ng-container>
+            </div>
+
+            <div class="top-item-card card">
+                <h3>💰 Top 3 Revenus</h3>
+                <ng-container *ngIf="top3Revenues$ | async as topRevenues">
+                    <div *ngIf="topRevenues.length === 0" class="no-data">
+                        Aucun revenu enregistré.
+                    </div>
+                    <ul>
+                        <li *ngFor="let revenue of topRevenues">
+                            <strong>{{ revenue.category }}:</strong> 
+                            <span>{{ revenue.totalAmount | number:'1.2-2' }} €</span>
+                        </li>
+                    </ul>
+                </ng-container>
+            </div>
+
+        </div>
+
+        <div class="add-button-container double-buttons">
+            <button class="add-transaction-button" (click)="openAddModal()">
+                + Ajouter
+            </button>
+            <button class="manage-category-button-in-grid" (click)="openCategoryModal()">
+                ⚙️ Catégories
+            </button>
+        </div>
+
     </div>
     
     <div class="filters card full-height-card">
@@ -73,7 +99,6 @@
 
         <div *ngIf="showBalanceChart" class="graph-area">
             <ng-container *ngIf="lineChartData as chartData">
-                
                 <div *ngIf="chartData.labels!.length > 0">
                     <canvas baseChart
                         [data]="chartData"

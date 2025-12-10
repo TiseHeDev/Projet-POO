@@ -17,7 +17,13 @@ header {
     color: white;
     padding: 15px 20px;
     text-align: center;
-    margin-bottom: 20px;
+    
+    /* CORRECTION : Ajout du border-radius pour arrondir l'encart */
+    border-bottom-left-radius: 8px; 
+    border-bottom-right-radius: 8px;
+    
+    /* Retirer la marge en bas du header pour qu'il se colle au content-wrapper */
+    margin-bottom: 0; 
 }
 
 h1 {
@@ -31,7 +37,7 @@ h1 {
     display: flex;
     flex-direction: column; 
     max-width: 1300px; 
-    margin: 0 auto;
+    margin: 20px auto; /* Ajout d'une marge en haut pour centrer le contenu sous le header */
     padding: 0 15px;
     gap: 20px; 
     align-items: center; 
@@ -45,7 +51,47 @@ h1 {
     padding: 15px;
 }
 
-/* SUPPRESSION: Retrait de top-actions et add-transaction-button car déplacés */
+/* NOUVEAU: Conteneur du gestionnaire de catégories */
+.category-manager-area {
+    width: 100%;
+}
+
+/* Bouton d'ajout de transaction (maintenant dans le Dashboard) */
+.top-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; 
+    gap: 15px; 
+}
+
+.add-transaction-button {
+    background-color: #28a745; 
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+}
+
+.manage-category-button {
+    background-color: #6c757d; 
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+}
+
+
+/* --- Styles de la Modale (Pop-up Centré) --- */
 
 .modal-backdrop {
     position: fixed;
@@ -70,6 +116,10 @@ h1 {
     position: relative; 
 }
 
+.large-modal {
+    max-width: 600px; 
+}
+
 .close-modal {
     position: absolute;
     top: 10px;
@@ -87,10 +137,6 @@ h1 {
 
 .close-modal:hover {
     color: #333;
-}
-
-.sidebar {
-    display: none;
 }
 
 .error {
