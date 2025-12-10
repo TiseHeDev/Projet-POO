@@ -1,13 +1,19 @@
 // src/app/components/dashboard/dashboard.ts
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { BudgetService } from '../../services/budget.service';
 import { Transaction } from '../../models/transaction.model';
-import { Observable, combineLatest, map, of } from 'rxjs'; // Ajout de 'of'
+import { Observable, combineLatest, map } from 'rxjs';
 
-// Interface pour les Top 3 Dépenses
+// --- Imports et Initialisation pour le Graphique ---
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartType } from 'chart.js';
+import { Chart, registerables } from 'chart.js'; 
+
+Chart.register(...registerables); 
+
 interface TopExpense {
   category: string;
   totalAmount: number;
@@ -16,12 +22,11 @@ interface TopExpense {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BaseChartDirective], 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
-  // L'opérateur "!" (non-null assertion operator) indique que la propriété sera initialisée plus tard (dans ngOnInit)
   filteredTransactions$!: Observable<Transaction[]>; 
   totalBalance$!: Observable<number>;
   balanceStatus$!: Observable<'vert' | 'rouge' | 'neutre'>;
@@ -30,25 +35,47 @@ export class Dashboard implements OnInit {
   // Variables de Filtre
   selectedMonth: string = ''; 
   selectedCategory: string = '';
-  // La liste des catégories doit être réinitialisée dans ngOnInit ou au constructeur pour se mettre à jour
-  allCategories: string[] = []; 
+  allCategories: string[] = [];
 
-  constructor(private budgetService: BudgetService) {}
+  // --- Propriétés du Graphique ---
+  showBalanceChart: boolean = false; 
+  
+  // CORRECTION: L'opérateur '!' et l'initialisation dans le constructeur
+  public lineChartData!: ChartConfiguration['data']; 
+  
+  public lineChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false, 
+    scales: {
+      x: { title: { display: true, text: 'Date' } },
+      y: { title: { display: true, text: 'Solde Cumulé (€)' } }
+    },
+    plugins: {
+      legend: { display: true }
+    }
+  };
+  public lineChartType: ChartType = 'line';
+
+  @Output() editTransaction = new EventEmitter<Transaction>();
+
+  constructor(private budgetService: BudgetService) {
+    // Initialisation dans le constructeur
+    this.lineChartData = {
+        datasets: [{ data: [], label: 'Solde Cumulé (€)' }],
+        labels: []
+    };
+  }
 
   ngOnInit(): void {
-    // Mise à jour des catégories disponibles (au cas où elles ont changé)
     this.allCategories = this.budgetService.getAllCategories();
 
-    // ... (Le reste de la logique des Observables reste inchangé) ...
-
-    // 1. Définition des transactions filtrées
     this.filteredTransactions$ = combineLatest([
         this.budgetService.transactions$
     ]).pipe(
         map(([transactions]) => {
             let filtered = transactions.slice();
             
-            // Filtre par Mois
+            // FILTRAGE
             if (this.selectedMonth) {
                 const [year, month] = this.selectedMonth.split('-');
                 filtered = filtered.filter(t => 
@@ -56,17 +83,20 @@ export class Dashboard implements OnInit {
                     t.date.getMonth() === parseInt(month) - 1
                 );
             }
-
-            // Filtre par Catégorie
             if (this.selectedCategory) {
                 filtered = filtered.filter(t => t.category === this.selectedCategory);
+            }
+            
+            // Mise à jour du graphique si affiché
+            if (this.showBalanceChart) {
+                this.updateBalanceChart(filtered);
             }
             
             return filtered;
         })
     );
     
-    // 2. Calcul du Solde Total
+    // CALCUL DU SOLDE ET STATUT
     this.totalBalance$ = this.filteredTransactions$.pipe(
         map(transactions => 
             transactions.reduce((acc, t) => 
@@ -75,7 +105,6 @@ export class Dashboard implements OnInit {
         )
     );
 
-    // 3. Détermination du Statut (Rouge/Vert)
     this.balanceStatus$ = this.totalBalance$.pipe(
         map(balance => {
             if (balance > 0) return 'vert';
@@ -84,21 +113,17 @@ export class Dashboard implements OnInit {
         })
     );
 
-    // 4. Calcul des Top 3 Dépenses
+    // TOP 3 DÉPENSES
     this.top3Expenses$ = this.filteredTransactions$.pipe(
         map(transactions => {
             const expenses = transactions.filter(t => t.type === 'Dépense');
-            
             const categoryTotals = expenses.reduce((acc, t) => {
                 acc[t.category] = (acc[t.category] || 0) + t.amount;
                 return acc;
             }, {} as Record<string, number>);
 
             return Object.keys(categoryTotals)
-                .map(category => ({ 
-                    category, 
-                    totalAmount: categoryTotals[category] 
-                }))
+                .map(category => ({ category, totalAmount: categoryTotals[category] }))
                 .sort((a, b) => b.totalAmount - a.totalAmount)
                 .slice(0, 3);
         })
@@ -106,25 +131,59 @@ export class Dashboard implements OnInit {
   }
   
   applyFilters(): void {
-    // Forcer la réinitialisation des observables avec les nouvelles valeurs de filtre
     this.ngOnInit(); 
   }
 
+  updateBalanceChart(transactions: Transaction[]): void {
+      const sortedTransactions = [...transactions].sort((a, b) => a.date.getTime() - b.date.getTime());
+
+      let cumulativeBalance = 0;
+      const labels: string[] = []; 
+      const data: number[] = [];    
+
+      sortedTransactions.forEach(t => {
+          const amount = t.type === 'Revenu' ? t.amount : -t.amount;
+          cumulativeBalance += amount;
+          
+          labels.push(this.formatDate(t.date)); 
+          data.push(cumulativeBalance);
+      });
+      
+      this.lineChartData = {
+          labels: labels,
+          datasets: [
+              {
+                  data: data,
+                  label: 'Solde Cumulé (€)',
+                  borderColor: '#007bff',
+                  backgroundColor: 'rgba(0, 123, 255, 0.3)',
+                  tension: 0.3, 
+                  fill: true,
+              }
+          ]
+      };
+  }
+
+  toggleChart(): void {
+    this.showBalanceChart = !this.showBalanceChart;
+    if (this.showBalanceChart) {
+        this.applyFilters(); 
+    }
+  }
+
+  onEdit(transaction: Transaction): void {
+    this.editTransaction.emit(transaction);
+    window.scrollTo(0, 0); 
+  }
+  
   formatDate(date: Date): string {
       return date.toLocaleDateString('fr-FR');
   }
 
-  /**
-   * CORRECTION DE L'ERREUR TS2345
-   * Accepte le type 'vert' | 'rouge' | 'neutre' | null pour gérer la valeur initiale du pipe async.
-   */
   getStatusClass(status: 'vert' | 'rouge' | 'neutre' | null): string {
-      // Si 'status' est null (avant la première émission de l'Observable), on retourne 'neutre' ou une classe par défaut.
       if (!status || status === 'neutre') return 'status-neutre';
       if (status === 'vert') return 'status-vert';
       if (status === 'rouge') return 'status-rouge';
-      
-      // Retour par défaut si jamais
       return 'status-neutre'; 
   }
 }

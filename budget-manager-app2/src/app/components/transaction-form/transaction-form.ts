@@ -1,9 +1,10 @@
 // src/app/components/transaction-form/transaction-form.ts
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BudgetService } from '../../services/budget.service';
 import { CommonModule } from '@angular/common';
+import { Transaction } from '../../models/transaction.model';
 
 @Component({
   selector: 'app-transaction-form',
@@ -12,18 +13,26 @@ import { CommonModule } from '@angular/common';
   templateUrl: './transaction-form.html',
   styleUrl: './transaction-form.css'
 })
-export class TransactionForm implements OnInit { // Implémentation de OnInit pour la logique d'initialisation
+export class TransactionForm implements OnInit, OnChanges {
   transactionForm: FormGroup;
 
-  // 1. Définir les listes de base (pour garantir la présence des catégories principales)
   private BASE_CATEGORIES: string[] = ['Nourriture', 'Logement', 'Transport', 'Loisirs', 'Santé', 'Salaire', 'Autre'];
   private BASE_METHODS: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque'];
   
-  categories: string[] = []; // Liste affichée dans le formulaire
-  methods: string[] = [];   // Liste affichée dans le formulaire
+  categories: string[] = []; 
+  methods: string[] = [];
+  
+  @Input() transactionToEdit: Transaction | null = null;
+  @Output() formSubmitted = new EventEmitter<void>();
+  @Output() formCancelled = new EventEmitter<void>();
+
+  get isEditMode(): boolean {
+    return !!this.transactionToEdit;
+  }
 
   constructor(private fb: FormBuilder, private budgetService: BudgetService) {
     this.transactionForm = this.fb.group({
+      id: [null], 
       date: [new Date().toISOString().substring(0, 10), Validators.required],
       category: ['', Validators.required],
       type: ['Dépense', Validators.required],
@@ -37,25 +46,47 @@ export class TransactionForm implements OnInit { // Implémentation de OnInit po
     this.updateLists();
   }
   
-  /**
-   * Combine les listes de base et les catégories/méthodes existantes dans le service.
-   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['transactionToEdit']) {
+      if (this.transactionToEdit) {
+        this.transactionForm.patchValue({
+          id: this.transactionToEdit.id,
+          date: this.transactionToEdit.date.toISOString().substring(0, 10),
+          category: this.transactionToEdit.category,
+          type: this.transactionToEdit.type,
+          method: this.transactionToEdit.method,
+          amount: this.transactionToEdit.amount,
+          description: this.transactionToEdit.description
+        });
+        this.updateLists(); 
+      } else {
+        this.resetForm();
+      }
+    }
+  }
+
   private updateLists(): void {
-      // Catégories
       const existingCategories = this.budgetService.getAllCategories();
-      // Utilise un Set pour obtenir les valeurs uniques puis les trie
       this.categories = [...new Set([...this.BASE_CATEGORIES, ...existingCategories])].sort();
       
-      // Moyens de paiement
       const existingMethods = this.budgetService.getAllMethods();
       this.methods = [...new Set([...this.BASE_METHODS, ...existingMethods])].sort();
+  }
+  
+  private resetForm(): void {
+      this.transactionForm.reset({
+        date: new Date().toISOString().substring(0, 10),
+        type: 'Dépense',
+        id: null
+      });
   }
 
   onSubmit(): void {
     if (this.transactionForm.valid) {
       const formValue = this.transactionForm.value;
 
-      const newTransaction = {
+      const transactionData = {
+        id: formValue.id,
         date: new Date(formValue.date),
         category: formValue.category,
         type: formValue.type,
@@ -64,17 +95,22 @@ export class TransactionForm implements OnInit { // Implémentation de OnInit po
         description: formValue.description
       };
 
-      this.budgetService.addTransaction(newTransaction);
-      alert('Transaction ajoutée et stockée localement !');
+      if (this.isEditMode) {
+        this.budgetService.updateTransaction(transactionData as Transaction);
+        alert('Transaction modifiée avec succès !');
+        this.formSubmitted.emit(); 
+      } else {
+        this.budgetService.addTransaction(transactionData);
+        alert('Transaction ajoutée et stockée localement !');
+        this.updateLists(); 
+      }
       
-      // Après l'ajout, mettez à jour les listes pour inclure la nouvelle catégorie/méthode si elle était nouvelle
-      this.updateLists(); 
-
-      // Réinitialiser le formulaire
-      this.transactionForm.reset({
-        date: new Date().toISOString().substring(0, 10),
-        type: 'Dépense'
-      });
+      this.resetForm();
     }
+  }
+  
+  onCancel(): void {
+      this.resetForm();
+      this.formCancelled.emit();
   }
 }

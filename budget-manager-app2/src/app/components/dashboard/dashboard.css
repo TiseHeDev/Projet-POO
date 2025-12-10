@@ -12,7 +12,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Solde et Statut */
 .balance-card {
     padding: 20px;
     border-radius: 8px;
@@ -23,15 +22,15 @@
 }
 
 .status-vert {
-    background-color: #4CAF50; /* Vert pour le positif */
+    background-color: #4CAF50;
 }
 
 .status-rouge {
-    background-color: #f44336; /* Rouge pour le négatif */
+    background-color: #f44336;
 }
 
 .status-neutre {
-    background-color: #ff9800; /* Orange/Neutre pour 0 */
+    background-color: #ff9800;
 }
 
 .balance-amount {
@@ -40,19 +39,13 @@
     margin: 5px 0 10px 0;
 }
 
-.status-message {
-    font-weight: 500;
-}
-
-/* Grille pour les Top 3 et Filtres */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Deux colonnes */
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 20px;
 }
 
-/* Top 3 Dépenses */
 .top-expenses ul {
     list-style: none;
     padding: 0;
@@ -67,7 +60,6 @@
     border-bottom: none;
 }
 
-/* Filtres */
 .filter-group {
     margin-bottom: 15px;
 }
@@ -82,6 +74,32 @@
     border-radius: 4px;
 }
 
+/* Styles pour le graphique */
+.chart-container {
+    margin-top: 20px;
+}
+
+.chart-toggle-button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+.chart-toggle-button:hover {
+    background-color: #218838;
+}
+
+.graph-area {
+    width: 100%;
+    min-height: 400px; 
+    position: relative; 
+}
 
 /* Tableau */
 table {
@@ -102,19 +120,35 @@ th {
 }
 
 .row-revenu {
-    background-color: #e8f5e9; /* Vert très clair */
+    background-color: #e8f5e9;
 }
 
 .row-depense {
-    background-color: #ffebee; /* Rouge très clair */
+    background-color: #ffebee;
 }
 
 .amount-cell {
     font-weight: 600;
 }
 
-.no-data-row {
+/* Style pour le bouton Modifier */
+.edit-button {
+    background-color: #ffc107; 
+    color: #333;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.2s;
+}
+.edit-button:hover {
+    background-color: #e0a800;
+}
+
+.no-data-row, .no-data {
     text-align: center;
     font-style: italic;
     color: #666;
+    padding: 10px 0;
 }

@@ -5,11 +5,17 @@
 <main class="content-wrapper">
   
   <section class="sidebar">
-    <app-transaction-form></app-transaction-form>
+    <app-transaction-form 
+      [transactionToEdit]="transactionToEdit"
+      (formSubmitted)="clearEditState()"
+      (formCancelled)="clearEditState()">
+    </app-transaction-form>
   </section>
 
   <section class="dashboard-area">
-    <app-dashboard></app-dashboard>
+    <app-dashboard 
+      (editTransaction)="onEditRequest($event)">
+    </app-dashboard>
   </section>
   
 </main>

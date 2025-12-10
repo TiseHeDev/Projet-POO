@@ -1,5 +1,6 @@
 <section class="form-container">
-  <h3>➕ Nouvelle Transaction</h3>
+  <h3 *ngIf="isEditMode">✏️ Modifier Transaction #{{ transactionToEdit?.id }}</h3>
+  <h3 *ngIf="!isEditMode">➕ Nouvelle Transaction</h3>
 
   <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
     
@@ -27,7 +28,7 @@
     <div class="form-group">
       <label for="category">Catégorie :</label>
       <select id="category" formControlName="category" required>
-        <option value="" disabled>Choisir ou entrer une catégorie...</option>
+        <option value="" disabled>Choisir une catégorie...</option>
         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
       </select>
     </div>
@@ -45,6 +46,13 @@
       <input id="description" type="text" formControlName="description">
     </div>
 
-    <button type="submit" [disabled]="!transactionForm.valid">Enregistrer</button>
+    <div class="form-actions">
+        <button type="submit" [disabled]="!transactionForm.valid">
+            {{ isEditMode ? 'Enregistrer les modifications' : 'Enregistrer' }}
+        </button>
+        <button type="button" *ngIf="isEditMode" (click)="onCancel()" class="cancel-button">
+            Annuler l'édition
+        </button>
+    </div>
   </form>
 </section>

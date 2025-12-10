@@ -23,7 +23,6 @@ export class BudgetService {
     if (data) {
       try {
         const transactions = JSON.parse(data) as Transaction[];
-        // Assurer que la date est un objet Date lors du chargement
         return transactions.map(t => ({
           ...t,
           date: new Date(t.date)
@@ -41,7 +40,6 @@ export class BudgetService {
     this.transactionsSubject.next(transactions);
   }
 
-  // Ajoute une transaction et met à jour le stockage
   addTransaction(transaction: Omit<Transaction, 'id'>): void {
     const currentTransactions = this.transactionsSubject.getValue();
     const newId = currentTransactions.length > 0
@@ -57,13 +55,21 @@ export class BudgetService {
     this.saveTransactions(updatedTransactions);
   }
 
-  // Retourne toutes les catégories uniques
+  updateTransaction(updatedTransaction: Transaction): void {
+    let currentTransactions = this.transactionsSubject.getValue();
+    const index = currentTransactions.findIndex(t => t.id === updatedTransaction.id);
+
+    if (index !== -1) {
+      currentTransactions[index] = updatedTransaction;
+      this.saveTransactions([...currentTransactions]); 
+    }
+  }
+
   getAllCategories(): string[] {
       const categories = this.transactionsSubject.getValue().map(t => t.category);
       return [...new Set(categories)].sort();
   }
   
-  // Retourne tous les types de paiement uniques
   getAllMethods(): string[] {
       const methods = this.transactionsSubject.getValue().map(t => t.method);
       return [...new Set(methods)].sort();

@@ -21,27 +21,30 @@ h1 {
     font-size: 1.8em;
 }
 
-/* Mise en page principale */
+/* Mise en page principale (Flexbox) */
 .content-wrapper {
     display: flex;
-    max-width: 1200px;
+    max-width: 1300px; /* Augmenter la largeur maximale pour plus d'espace */
     margin: 0 auto;
     padding: 0 15px;
-    gap: 20px;
+    gap: 25px; /* Espace entre la sidebar et le dashboard */
+    align-items: flex-start; /* Aligner les éléments en haut */
 }
 
 .sidebar {
-    flex: 0 0 300px; /* Largeur fixe pour le formulaire */
+    flex: 0 0 350px; /* Largeur fixe plus grande pour le formulaire */
+    position: sticky; /* Pour que le formulaire reste visible en scrollant */
+    top: 20px;
 }
 
 .dashboard-area {
-    flex-grow: 1; /* Prend l'espace restant pour le tableau de bord */
+    flex-grow: 1; 
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px; /* Ajouter un peu de padding à la zone principale */
 }
 
-/* Erreur de validation (utilisée dans le formulaire) */
 .error {
     color: red;
     font-size: 0.8em;

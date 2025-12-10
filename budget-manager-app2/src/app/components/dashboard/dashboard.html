@@ -41,6 +41,31 @@
     </div>
   </div>
 
+  <div class="chart-container card">
+    <h3>📈 Évolution du Solde</h3>
+    
+    <button (click)="toggleChart()" class="chart-toggle-button">
+        {{ showBalanceChart ? 'Masquer le Graphique' : 'Afficher le Graphique' }}
+    </button>
+
+    <div *ngIf="showBalanceChart" class="graph-area">
+        <ng-container *ngIf="lineChartData as chartData">
+            
+            <div *ngIf="chartData.labels!.length > 0">
+                <canvas baseChart
+                    [data]="chartData"
+                    [options]="lineChartOptions"
+                    [type]="lineChartType">
+                </canvas>
+            </div>
+            
+            <div *ngIf="chartData.labels!.length === 0" class="no-data">
+                Ajoutez des transactions pour afficher l'évolution du solde.
+            </div>
+        </ng-container>
+    </div>
+  </div>
+
 
   <h3>📜 Liste des Transactions ({{ (filteredTransactions$ | async)?.length || 0 }} éléments)</h3>
   <table>
@@ -52,6 +77,7 @@
         <th>Moyen</th>
         <th>Montant (€)</th>
         <th>Description</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -63,9 +89,12 @@
         <td>{{ t.method }}</td>
         <td class="amount-cell">{{ t.amount | number:'1.2-2' }}</td>
         <td>{{ t.description }}</td>
+        <td>
+            <button class="edit-button" (click)="onEdit(t)">Modifier</button> 
+        </td>
       </tr>
       <tr *ngIf="(filteredTransactions$ | async)?.length === 0">
-          <td colspan="6" class="no-data-row">Aucune transaction trouvée pour les filtres.</td>
+          <td colspan="7" class="no-data-row">Aucune transaction trouvée pour les filtres.</td>
       </tr>
     </tbody>
   </table>
