@@ -4,18 +4,28 @@
 
 <main class="content-wrapper">
   
-  <section class="sidebar">
-    <app-transaction-form 
-      [transactionToEdit]="transactionToEdit"
-      (formSubmitted)="clearEditState()"
-      (formCancelled)="clearEditState()">
-    </app-transaction-form>
-  </section>
+  <div class="top-actions">
+    <button class="add-transaction-button" (click)="openAddModal()">
+      + Ajouter une nouvelle Transaction
+    </button>
+  </div>
 
-  <section class="dashboard-area">
+  <section class="dashboard-area full-width">
     <app-dashboard 
       (editTransaction)="onEditRequest($event)">
     </app-dashboard>
   </section>
+  
+  <div class="modal-backdrop" *ngIf="isModalOpen">
+    <div class="modal-content">
+      <button class="close-modal" (click)="clearEditState()">X</button>
+      
+      <app-transaction-form 
+        [transactionToEdit]="transactionToEdit"
+        (formSubmitted)="clearEditState()"
+        (formCancelled)="clearEditState()">
+      </app-transaction-form>
+    </div>
+  </div>
   
 </main>

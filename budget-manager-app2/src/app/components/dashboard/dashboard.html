@@ -71,12 +71,48 @@
   <table>
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Catégorie</th>
-        <th>Type</th>
-        <th>Moyen</th>
-        <th>Montant (€)</th>
-        <th>Description</th>
+        <th class="sortable-header" (click)="setSort('date')">
+          Date
+          <span *ngIf="currentSortColumn === 'date'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
+        <th class="sortable-header" (click)="setSort('category')">
+          Catégorie
+          <span *ngIf="currentSortColumn === 'category'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
+        <th class="sortable-header" (click)="setSort('type')">
+          Type
+          <span *ngIf="currentSortColumn === 'type'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
+        <th class="sortable-header" (click)="setSort('method')">
+          Moyen
+          <span *ngIf="currentSortColumn === 'method'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
+        <th class="sortable-header" (click)="setSort('amount')">
+          Montant (€)
+          <span *ngIf="currentSortColumn === 'amount'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
+        <th class="sortable-header" (click)="setSort('description')">
+          Description
+          <span *ngIf="currentSortColumn === 'description'">
+            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+          </span>
+        </th>
+        
         <th>Action</th>
       </tr>
     </thead>
@@ -89,8 +125,9 @@
         <td>{{ t.method }}</td>
         <td class="amount-cell">{{ t.amount | number:'1.2-2' }}</td>
         <td>{{ t.description }}</td>
-        <td>
+        <td class="action-buttons">
             <button class="edit-button" (click)="onEdit(t)">Modifier</button> 
+            <button class="delete-button" (click)="onDelete(t.id, t.description || 'cette transaction')">Supprimer</button>
         </td>
       </tr>
       <tr *ngIf="(filteredTransactions$ | async)?.length === 0">

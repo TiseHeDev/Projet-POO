@@ -1,7 +1,7 @@
 /* src/app/components/dashboard/dashboard.css */
 
 .dashboard-section {
-    padding: 20px;
+    padding: 0;
 }
 
 .card {
@@ -55,13 +55,14 @@
     border-bottom: 1px dashed #eee;
     display: flex;
     justify-content: space-between;
+    font-size: 1.1em;
 }
 .top-expenses li:last-child {
     border-bottom: none;
 }
 
 .filter-group {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 .filters label, .filters input, .filters select {
     display: block;
@@ -77,6 +78,7 @@
 /* Styles pour le graphique */
 .chart-container {
     margin-top: 20px;
+    margin-bottom: 0; 
 }
 
 .chart-toggle-button {
@@ -97,15 +99,35 @@
 
 .graph-area {
     width: 100%;
-    min-height: 400px; 
+    /* CORRECTION : Supprimer la hauteur fixe pour que le conteneur s'ajuste au graphique */
+    /* REMPLACER height: 400px; par: */
+    height: 150px; 
+    min-height: 100px; /* Optionnel: assure une hauteur minimale si le graphique est très petit */
     position: relative; 
+    margin-bottom: 15px; 
 }
 
 /* Tableau */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 5px; 
+    font-size: 0.95em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px; 
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none; 
+    transition: background-color 0.1s;
+}
+
+.sortable-header:hover {
+    background-color: #e0e0e0;
 }
 
 th, td {
@@ -131,7 +153,6 @@ th {
     font-weight: 600;
 }
 
-/* Style pour le bouton Modifier */
 .edit-button {
     background-color: #ffc107; 
     color: #333;
@@ -144,6 +165,20 @@ th {
 }
 .edit-button:hover {
     background-color: #e0a800;
+}
+
+.delete-button {
+    background-color: #dc3545; 
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.2s;
+}
+.delete-button:hover {
+    background-color: #c82333;
 }
 
 .no-data-row, .no-data {

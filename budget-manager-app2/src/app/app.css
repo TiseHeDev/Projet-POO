@@ -1,8 +1,12 @@
 /* src/app/app.css */
 
+/* APPLICATION DE LA POLICE SUR TOUS LES ÉLÉMENTS DE L'APPLICATION */
+:root, body, app-root, * {
+    font-family: 'Roboto', sans-serif !important;
+}
+
 /* Global Reset/Base */
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f7f9;
@@ -19,30 +23,94 @@ header {
 h1 {
     margin: 0;
     font-size: 1.8em;
+    font-weight: 500;
 }
 
-/* Mise en page principale (Flexbox) */
+/* Mise en page principale (Changement de disposition) */
 .content-wrapper {
     display: flex;
-    max-width: 1300px; /* Augmenter la largeur maximale pour plus d'espace */
+    flex-direction: column; 
+    max-width: 1300px; 
     margin: 0 auto;
     padding: 0 15px;
-    gap: 25px; /* Espace entre la sidebar et le dashboard */
-    align-items: flex-start; /* Aligner les éléments en haut */
+    gap: 20px; 
+    align-items: center; 
 }
 
-.sidebar {
-    flex: 0 0 350px; /* Largeur fixe plus grande pour le formulaire */
-    position: sticky; /* Pour que le formulaire reste visible en scrollant */
-    top: 20px;
+/* CORRECTION : Aligner le bouton à gauche et gérer la largeur */
+.top-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* Changement ici : Aligner à gauche */
+}
+
+.add-transaction-button {
+    background-color: #28a745; 
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .dashboard-area {
-    flex-grow: 1; 
+    width: 100%;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px; /* Ajouter un peu de padding à la zone principale */
+    padding: 15px;
+}
+
+/* --- Styles de la Modale (Pop-up Centré) --- */
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+}
+
+.modal-content {
+    background: white;
+    padding: 0; 
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-width: 450px; 
+    width: 90%;
+    position: relative; /* IMPORTANT: Pour positionner la croix */
+}
+
+/* NOUVEAU: Style du bouton de fermeture (Croix) */
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px; /* Positionné en haut à droite */
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    font-weight: 300;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px;
+    z-index: 1001; /* Assure qu'il est cliquable au-dessus du formulaire */
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.sidebar {
+    display: none;
 }
 
 .error {

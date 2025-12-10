@@ -19,6 +19,10 @@ interface TopExpense {
   totalAmount: number;
 }
 
+// Définir les types de tri
+type SortColumn = 'date' | 'category' | 'type' | 'method' | 'amount' | 'description' | '';
+type SortDirection = 'asc' | 'desc' | '';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -37,10 +41,13 @@ export class Dashboard implements OnInit {
   selectedCategory: string = '';
   allCategories: string[] = [];
 
+  // --- Propriétés du Tri ---
+  currentSortColumn: SortColumn = 'date'; 
+  currentSortDirection: SortDirection = 'desc'; 
+
   // --- Propriétés du Graphique ---
   showBalanceChart: boolean = false; 
   
-  // CORRECTION: L'opérateur '!' et l'initialisation dans le constructeur
   public lineChartData!: ChartConfiguration['data']; 
   
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -59,7 +66,6 @@ export class Dashboard implements OnInit {
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   constructor(private budgetService: BudgetService) {
-    // Initialisation dans le constructeur
     this.lineChartData = {
         datasets: [{ data: [], label: 'Solde Cumulé (€)' }],
         labels: []
@@ -75,7 +81,7 @@ export class Dashboard implements OnInit {
         map(([transactions]) => {
             let filtered = transactions.slice();
             
-            // FILTRAGE
+            // 1. FILTRAGE
             if (this.selectedMonth) {
                 const [year, month] = this.selectedMonth.split('-');
                 filtered = filtered.filter(t => 
@@ -87,7 +93,10 @@ export class Dashboard implements OnInit {
                 filtered = filtered.filter(t => t.category === this.selectedCategory);
             }
             
-            // Mise à jour du graphique si affiché
+            // 2. TRI APPLIQUÉ
+            this.sortTransactions(filtered, this.currentSortColumn, this.currentSortDirection);
+
+            // 3. Mise à jour du graphique si affiché
             if (this.showBalanceChart) {
                 this.updateBalanceChart(filtered);
             }
@@ -130,13 +139,62 @@ export class Dashboard implements OnInit {
     );
   }
   
+  private sortTransactions(transactions: Transaction[], column: SortColumn, direction: SortDirection): void {
+      if (!column || !direction) {
+          return;
+      }
+
+      transactions.sort((a, b) => {
+          let aValue: any;
+          let bValue: any;
+          
+          if (column === 'date') {
+              aValue = a[column].getTime();
+              bValue = b[column].getTime();
+          } else if (column === 'amount') {
+              aValue = a[column];
+              bValue = b[column];
+          } else {
+              aValue = (a[column] as string || '').toLowerCase();
+              bValue = (b[column] as string || '').toLowerCase();
+          }
+
+          if (aValue < bValue) {
+              return direction === 'asc' ? -1 : 1;
+          }
+          if (aValue > bValue) {
+              return direction === 'asc' ? 1 : -1;
+          }
+          return 0;
+      });
+  }
+
+  setSort(column: SortColumn): void {
+      if (this.currentSortColumn === column) {
+          this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+          this.currentSortColumn = column;
+          this.currentSortDirection = 'asc';
+      }
+      this.applyFilters(); 
+  }
+
+  // NOUVEAU: Méthode pour la suppression
+  onDelete(id: number, description: string): void {
+      if (confirm(`Êtes-vous sûr de vouloir supprimer la transaction : ${description} (ID: ${id}) ?`)) {
+          this.budgetService.deleteTransaction(id);
+          // Le service notifie tous les abonnés (le dashboard) via l'Observable,
+          // donc l'affichage devrait se mettre à jour automatiquement.
+      }
+  }
+
   applyFilters(): void {
     this.ngOnInit(); 
   }
 
   updateBalanceChart(transactions: Transaction[]): void {
       const sortedTransactions = [...transactions].sort((a, b) => a.date.getTime() - b.date.getTime());
-
+      
       let cumulativeBalance = 0;
       const labels: string[] = []; 
       const data: number[] = [];    

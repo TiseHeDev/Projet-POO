@@ -1,21 +1,26 @@
 /* src/app/components/transaction-form/transaction-form.css */
 
 .form-container {
-    padding: 20px;
-    border: 1px solid #ccc;
+    padding: 25px; /* Augmenter le padding interne pour l'esthétique */
+    border: none; /* Retirer la bordure car la modale en a déjà une */
     border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white; /* Fond blanc dans la modale */
+    box-shadow: none;
 }
 
 .form-group {
     margin-bottom: 15px;
 }
 
+/* Assurer que le dernier champ du formulaire a une marge avant les boutons */
+.form-group:last-of-type {
+    margin-bottom: 20px; 
+}
+
 label {
     display: block;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 500; /* Plus léger pour un look minimaliste */
 }
 
 input[type="date"], 
@@ -27,6 +32,7 @@ select {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 1em;
 }
 
 .error-message {
@@ -53,6 +59,8 @@ button[type="submit"] {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
 button[type="submit"]:disabled {
@@ -69,6 +77,8 @@ button[type="submit"]:disabled {
     cursor: pointer;
     font-size: 1em;
     flex-grow: 1;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
 .cancel-button:hover {

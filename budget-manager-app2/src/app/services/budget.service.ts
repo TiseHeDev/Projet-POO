@@ -65,6 +65,13 @@ export class BudgetService {
     }
   }
 
+  // NOUVEAU: Suppression de transaction
+  deleteTransaction(id: number): void {
+      const currentTransactions = this.transactionsSubject.getValue();
+      const updatedTransactions = currentTransactions.filter(t => t.id !== id);
+      this.saveTransactions(updatedTransactions);
+  }
+
   getAllCategories(): string[] {
       const categories = this.transactionsSubject.getValue().map(t => t.category);
       return [...new Set(categories)].sort();
