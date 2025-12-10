@@ -31,23 +31,20 @@ type SortDirection = 'asc' | 'desc' | '';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
+  // ... (propriétés inchangées) ...
   filteredTransactions$!: Observable<Transaction[]>; 
   totalBalance$!: Observable<number>;
   balanceStatus$!: Observable<'vert' | 'rouge' | 'neutre'>;
   top3Expenses$!: Observable<TopExpense[]>;
   
-  // Variables de Filtre
   selectedMonth: string = ''; 
   selectedCategory: string = '';
   allCategories: string[] = [];
 
-  // --- Propriétés du Tri ---
   currentSortColumn: SortColumn = 'date'; 
   currentSortDirection: SortDirection = 'desc'; 
 
-  // --- Propriétés du Graphique ---
   showBalanceChart: boolean = false; 
-  
   public lineChartData!: ChartConfiguration['data']; 
   
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -64,6 +61,7 @@ export class Dashboard implements OnInit {
   public lineChartType: ChartType = 'line';
 
   @Output() editTransaction = new EventEmitter<Transaction>();
+  @Output() addTransaction = new EventEmitter<void>(); // NOUVEAU: Événement pour ajouter
 
   constructor(private budgetService: BudgetService) {
     this.lineChartData = {
@@ -81,7 +79,7 @@ export class Dashboard implements OnInit {
         map(([transactions]) => {
             let filtered = transactions.slice();
             
-            // 1. FILTRAGE
+            // FILTRAGE
             if (this.selectedMonth) {
                 const [year, month] = this.selectedMonth.split('-');
                 filtered = filtered.filter(t => 
@@ -139,6 +137,14 @@ export class Dashboard implements OnInit {
     );
   }
   
+  // ... (sortTransactions, setSort, onDelete, exportData, etc. inchangées) ...
+
+  // NOUVEAU: Déclenche l'ouverture de la modale d'ajout via l'événement Output
+  openAddModal(): void {
+      this.addTransaction.emit();
+  }
+
+  // ... (autres méthodes inchangées)
   private sortTransactions(transactions: Transaction[], column: SortColumn, direction: SortDirection): void {
       if (!column || !direction) {
           return;
@@ -179,13 +185,70 @@ export class Dashboard implements OnInit {
       this.applyFilters(); 
   }
 
-  // NOUVEAU: Méthode pour la suppression
   onDelete(id: number, description: string): void {
       if (confirm(`Êtes-vous sûr de vouloir supprimer la transaction : ${description} (ID: ${id}) ?`)) {
           this.budgetService.deleteTransaction(id);
-          // Le service notifie tous les abonnés (le dashboard) via l'Observable,
-          // donc l'affichage devrait se mettre à jour automatiquement.
       }
+  }
+
+  exportData(): void {
+      const transactions = this.budgetService.getAllTransactions();
+      
+      const serializableData = transactions.map(t => ({
+          ...t,
+          date: t.date.toISOString()
+      }));
+
+      const jsonString = JSON.stringify(serializableData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      
+      const a = document.createElement('a');
+      const date = new Date().toISOString().substring(0, 10);
+      a.download = `budget_transactions_${date}.json`;
+      a.href = URL.createObjectURL(blob);
+      
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  }
+  
+  handleFileInput(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      const file = input.files?.[0];
+
+      if (!file) {
+          alert("Aucun fichier sélectionné.");
+          return;
+      }
+      
+      if (!file.name.endsWith('.json')) {
+          alert("Veuillez sélectionner un fichier au format .json.");
+          return;
+      }
+
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+          try {
+              const content = e.target!.result as string;
+              const importedData: Transaction[] = JSON.parse(content);
+              
+              if (!Array.isArray(importedData)) {
+                  throw new Error("Le fichier JSON n'est pas un tableau de transactions valide.");
+              }
+              
+              if (confirm(`Êtes-vous sûr de vouloir remplacer les ${this.budgetService.getAllTransactions().length} transactions actuelles par ${importedData.length} transactions du fichier ?`)) {
+                  this.budgetService.importTransactions(importedData);
+                  alert(`Importation réussie ! ${importedData.length} transactions chargées.`);
+              }
+          } catch (error) {
+              alert(`Erreur lors du traitement du fichier : ${error}`);
+              console.error("Erreur d'importation:", error);
+          }
+          input.value = ''; 
+      };
+
+      reader.readAsText(file);
   }
 
   applyFilters(): void {

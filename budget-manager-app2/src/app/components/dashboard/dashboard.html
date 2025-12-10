@@ -13,18 +13,26 @@
     
     <div class="top-expenses card">
       <h3>🔥 Top 3 Dépenses</h3>
-      <div *ngIf="(top3Expenses$ | async)?.length === 0" class="no-data">
-        Aucune dépense enregistrée (ou filtrée).
-      </div>
-      <ul>
-        <li *ngFor="let expense of top3Expenses$ | async">
-          <strong>{{ expense.category }}:</strong> 
-          <span>{{ expense.totalAmount | number:'1.2-2' }} €</span>
-        </li>
-      </ul>
+      <ng-container *ngIf="top3Expenses$ | async as topExpenses">
+          <div *ngIf="topExpenses.length === 0" class="no-data">
+            Aucune dépense enregistrée (ou filtrée).
+          </div>
+          <ul>
+            <li *ngFor="let expense of topExpenses">
+              <strong>{{ expense.category }}:</strong> 
+              <span>{{ expense.totalAmount | number:'1.2-2' }} €</span>
+            </li>
+          </ul>
+      </ng-container>
     </div>
     
-    <div class="filters card">
+    <div class="add-button-container">
+        <button class="add-transaction-button" (click)="openAddModal()">
+            + Ajouter une nouvelle Transaction
+        </button>
+    </div>
+    
+    <div class="filters card full-height-card">
       <h3>🔎 Filtres</h3>
       <div class="filter-group">
         <label for="month-filter">Filtrer par Mois :</label>
@@ -38,101 +46,116 @@
           <option *ngFor="let cat of allCategories" [value]="cat">{{ cat }}</option>
         </select>
       </div>
+      
+      <button class="export-button" (click)="exportData()">Exporter les données (JSON)</button>
+      
+      <div class="import-container">
+          <input type="file" #fileInput hidden (change)="handleFileInput($event)" accept=".json">
+          <button class="import-button" (click)="fileInput.click()">Importer les données (JSON)</button>
+      </div>
+      
     </div>
   </div>
 
-  <div class="chart-container card">
-    <h3>📈 Évolution du Solde</h3>
-    
-    <button (click)="toggleChart()" class="chart-toggle-button">
-        {{ showBalanceChart ? 'Masquer le Graphique' : 'Afficher le Graphique' }}
-    </button>
+  <ng-container *ngIf="filteredTransactions$ | async as transactions">
+      
+      <div *ngIf="transactions.length === 0" class="data-warning card">
+        <h3>⚠ Aucune donnée chargée</h3>
+        <p>Vos transactions ne sont pas sauvegardées localement. Veuillez utiliser le bouton **Importer les données** pour charger votre fichier JSON, ou commencer à ajouter de nouvelles transactions (qui ne seront pas sauvegardées après la fermeture du navigateur).</p>
+      </div>
+      
+      <div class="chart-container card" *ngIf="transactions.length > 0"> 
+        <h3>📈 Évolution du Solde</h3>
+        
+        <button (click)="toggleChart()" class="chart-toggle-button">
+            {{ showBalanceChart ? 'Masquer le Graphique' : 'Afficher le Graphique' }}
+        </button>
 
-    <div *ngIf="showBalanceChart" class="graph-area">
-        <ng-container *ngIf="lineChartData as chartData">
+        <div *ngIf="showBalanceChart" class="graph-area">
+            <ng-container *ngIf="lineChartData as chartData">
+                
+                <div *ngIf="chartData.labels!.length > 0">
+                    <canvas baseChart
+                        [data]="chartData"
+                        [options]="lineChartOptions"
+                        [type]="lineChartType">
+                    </canvas>
+                </div>
+                
+                <div *ngIf="chartData.labels!.length === 0" class="no-data">
+                    Pas assez de données pour afficher le graphique.
+                </div>
+            </ng-container>
+        </div>
+      </div>
+      
+      <h3>📜 Liste des Transactions ({{ transactions.length }} éléments)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable-header" (click)="setSort('date')">
+              Date
+              <span *ngIf="currentSortColumn === 'date'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
             
-            <div *ngIf="chartData.labels!.length > 0">
-                <canvas baseChart
-                    [data]="chartData"
-                    [options]="lineChartOptions"
-                    [type]="lineChartType">
-                </canvas>
-            </div>
+            <th class="sortable-header" (click)="setSort('category')">
+              Catégorie
+              <span *ngIf="currentSortColumn === 'category'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
             
-            <div *ngIf="chartData.labels!.length === 0" class="no-data">
-                Ajoutez des transactions pour afficher l'évolution du solde.
-            </div>
-        </ng-container>
-    </div>
-  </div>
-
-
-  <h3>📜 Liste des Transactions ({{ (filteredTransactions$ | async)?.length || 0 }} éléments)</h3>
-  <table>
-    <thead>
-      <tr>
-        <th class="sortable-header" (click)="setSort('date')">
-          Date
-          <span *ngIf="currentSortColumn === 'date'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th class="sortable-header" (click)="setSort('category')">
-          Catégorie
-          <span *ngIf="currentSortColumn === 'category'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th class="sortable-header" (click)="setSort('type')">
-          Type
-          <span *ngIf="currentSortColumn === 'type'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th class="sortable-header" (click)="setSort('method')">
-          Moyen
-          <span *ngIf="currentSortColumn === 'method'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th class="sortable-header" (click)="setSort('amount')">
-          Montant (€)
-          <span *ngIf="currentSortColumn === 'amount'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th class="sortable-header" (click)="setSort('description')">
-          Description
-          <span *ngIf="currentSortColumn === 'description'">
-            {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
-          </span>
-        </th>
-        
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let t of filteredTransactions$ | async" 
-          [ngClass]="{'row-revenu': t.type === 'Revenu', 'row-depense': t.type === 'Dépense'}">
-        <td>{{ formatDate(t.date) }}</td>
-        <td>{{ t.category }}</td>
-        <td>{{ t.type }}</td>
-        <td>{{ t.method }}</td>
-        <td class="amount-cell">{{ t.amount | number:'1.2-2' }}</td>
-        <td>{{ t.description }}</td>
-        <td class="action-buttons">
-            <button class="edit-button" (click)="onEdit(t)">Modifier</button> 
-            <button class="delete-button" (click)="onDelete(t.id, t.description || 'cette transaction')">Supprimer</button>
-        </td>
-      </tr>
-      <tr *ngIf="(filteredTransactions$ | async)?.length === 0">
-          <td colspan="7" class="no-data-row">Aucune transaction trouvée pour les filtres.</td>
-      </tr>
-    </tbody>
-  </table>
+            <th class="sortable-header" (click)="setSort('type')">
+              Type
+              <span *ngIf="currentSortColumn === 'type'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
+            
+            <th class="sortable-header" (click)="setSort('method')">
+              Moyen
+              <span *ngIf="currentSortColumn === 'method'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
+            
+            <th class="sortable-header" (click)="setSort('amount')">
+              Montant (€)
+              <span *ngIf="currentSortColumn === 'amount'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
+            
+            <th class="sortable-header" (click)="setSort('description')">
+              Description
+              <span *ngIf="currentSortColumn === 'description'">
+                {{ currentSortDirection === 'asc' ? ' &uarr;' : ' &darr;' }}
+              </span>
+            </th>
+            
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of transactions" 
+              [ngClass]="{'row-revenu': t.type === 'Revenu', 'row-depense': t.type === 'Dépense'}">
+            <td>{{ formatDate(t.date) }}</td>
+            <td>{{ t.category }}</td>
+            <td>{{ t.type }}</td>
+            <td>{{ t.method }}</td>
+            <td class="amount-cell">{{ t.amount | number:'1.2-2' }}</td>
+            <td>{{ t.description }}</td>
+            <td class="action-buttons">
+                <button class="edit-button" (click)="onEdit(t)">Modifier</button> 
+                <button class="delete-button" (click)="onDelete(t.id, t.description || 'cette transaction')">Supprimer</button>
+            </td>
+          </tr>
+          <tr *ngIf="transactions.length === 0">
+              <td colspan="7" class="no-data-row">Aucune transaction chargée.</td>
+          </tr>
+        </tbody>
+      </table>
+  </ng-container>
 </section>

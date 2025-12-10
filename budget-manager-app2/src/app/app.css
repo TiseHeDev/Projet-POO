@@ -26,7 +26,7 @@ h1 {
     font-weight: 500;
 }
 
-/* Mise en page principale (Changement de disposition) */
+/* Mise en page principale */
 .content-wrapper {
     display: flex;
     flex-direction: column; 
@@ -37,25 +37,6 @@ h1 {
     align-items: center; 
 }
 
-/* CORRECTION : Aligner le bouton à gauche et gérer la largeur */
-.top-actions {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start; /* Changement ici : Aligner à gauche */
-}
-
-.add-transaction-button {
-    background-color: #28a745; 
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
 .dashboard-area {
     width: 100%;
     background-color: white;
@@ -64,7 +45,7 @@ h1 {
     padding: 15px;
 }
 
-/* --- Styles de la Modale (Pop-up Centré) --- */
+/* SUPPRESSION: Retrait de top-actions et add-transaction-button car déplacés */
 
 .modal-backdrop {
     position: fixed;
@@ -86,14 +67,13 @@ h1 {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     max-width: 450px; 
     width: 90%;
-    position: relative; /* IMPORTANT: Pour positionner la croix */
+    position: relative; 
 }
 
-/* NOUVEAU: Style du bouton de fermeture (Croix) */
 .close-modal {
     position: absolute;
     top: 10px;
-    right: 10px; /* Positionné en haut à droite */
+    right: 10px; 
     background: none;
     border: none;
     font-size: 1.5em;
@@ -102,7 +82,7 @@ h1 {
     cursor: pointer;
     line-height: 1;
     padding: 5px;
-    z-index: 1001; /* Assure qu'il est cliquable au-dessus du formulaire */
+    z-index: 1001; 
 }
 
 .close-modal:hover {

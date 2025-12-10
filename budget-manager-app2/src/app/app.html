@@ -4,16 +4,10 @@
 
 <main class="content-wrapper">
   
-  <div class="top-actions">
-    <button class="add-transaction-button" (click)="openAddModal()">
-      + Ajouter une nouvelle Transaction
-    </button>
-  </div>
-
   <section class="dashboard-area full-width">
     <app-dashboard 
-      (editTransaction)="onEditRequest($event)">
-    </app-dashboard>
+      (editTransaction)="onEditRequest($event)"
+      (addTransaction)="onAddRequest()"> </app-dashboard>
   </section>
   
   <div class="modal-backdrop" *ngIf="isModalOpen">

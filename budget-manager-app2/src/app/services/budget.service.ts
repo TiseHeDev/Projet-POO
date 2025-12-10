@@ -8,35 +8,21 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BudgetService {
-  private storageKey = 'budget_transactions';
+  // Suppression de storageKey
   private transactionsSubject: BehaviorSubject<Transaction[]>;
   public transactions$: Observable<Transaction[]>;
 
   constructor() {
-    const initialTransactions = this.loadTransactions();
-    this.transactionsSubject = new BehaviorSubject<Transaction[]>(initialTransactions);
+    // CORRECTION : Initialisation à un tableau vide. 
+    // Les données ne sont PAS chargées au démarrage.
+    this.transactionsSubject = new BehaviorSubject<Transaction[]>([]);
     this.transactions$ = this.transactionsSubject.asObservable();
   }
 
-  private loadTransactions(): Transaction[] {
-    const data = localStorage.getItem(this.storageKey);
-    if (data) {
-      try {
-        const transactions = JSON.parse(data) as Transaction[];
-        return transactions.map(t => ({
-          ...t,
-          date: new Date(t.date)
-        }));
-      } catch (e) {
-        console.error("Erreur lors de la lecture du localStorage", e);
-        return [];
-      }
-    }
-    return [];
-  }
-
-  private saveTransactions(transactions: Transaction[]): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(transactions));
+  // SUPPRESSION : Suppression des méthodes loadTransactions et saveTransactions
+  
+  // NOUVEAU: Méthode interne pour notifier les abonnés et mettre à jour le Subject
+  private updateTransactions(transactions: Transaction[]): void {
     this.transactionsSubject.next(transactions);
   }
 
@@ -52,7 +38,7 @@ export class BudgetService {
     };
 
     const updatedTransactions = [...currentTransactions, newTransaction];
-    this.saveTransactions(updatedTransactions);
+    this.updateTransactions(updatedTransactions); // Utilisation de la méthode de mise à jour
   }
 
   updateTransaction(updatedTransaction: Transaction): void {
@@ -61,15 +47,36 @@ export class BudgetService {
 
     if (index !== -1) {
       currentTransactions[index] = updatedTransaction;
-      this.saveTransactions([...currentTransactions]); 
+      this.updateTransactions([...currentTransactions]); // Utilisation de la méthode de mise à jour
     }
   }
 
-  // NOUVEAU: Suppression de transaction
   deleteTransaction(id: number): void {
       const currentTransactions = this.transactionsSubject.getValue();
       const updatedTransactions = currentTransactions.filter(t => t.id !== id);
-      this.saveTransactions(updatedTransactions);
+      this.updateTransactions(updatedTransactions); // Utilisation de la méthode de mise à jour
+  }
+
+  getAllTransactions(): Transaction[] {
+      return this.transactionsSubject.getValue();
+  }
+
+  // Méthode pour importer/remplacer les transactions (devient la méthode de chargement)
+  importTransactions(importedData: Transaction[]): void {
+      // Assurer que les dates sont bien des objets Date
+      const parsedTransactions = importedData.map(t => ({
+          ...t,
+          date: new Date(t.date)
+      }));
+      
+      // Assurer des IDs uniques pour le nouveau set
+      const updatedTransactions = parsedTransactions.map((t, index) => ({
+          ...t,
+          id: t.id || index + 1
+      }));
+
+      // Mettre à jour et notifier le système
+      this.updateTransactions(updatedTransactions);
   }
 
   getAllCategories(): string[] {

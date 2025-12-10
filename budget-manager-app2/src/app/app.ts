@@ -17,7 +17,6 @@ export class App {
   title = 'Gestionnaire de Budget';
   
   transactionToEdit: Transaction | null = null;
-  // NOUVEAU: État pour contrôler l'affichage de la modale
   isModalOpen: boolean = false; 
   
   onEditRequest(transaction: Transaction): void {
@@ -25,14 +24,13 @@ export class App {
     this.isModalOpen = true; // Ouvre la modale en mode édition
   }
   
-  // Modifié: Ferme la modale et réinitialise l'état d'édition
   clearEditState(): void {
     this.transactionToEdit = null;
     this.isModalOpen = false;
   }
   
-  // NOUVEAU: Ouvre la modale en mode ajout
-  openAddModal(): void {
+  // NOUVEAU/MODIFIÉ: Gère l'ouverture de la modale (Ajout ou Édition)
+  onAddRequest(): void { 
       this.transactionToEdit = null; // Assure le mode Ajout
       this.isModalOpen = true;
   }
