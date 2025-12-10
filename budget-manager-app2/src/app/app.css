@@ -1,0 +1,48 @@
+/* src/app/app.css */
+
+/* Global Reset/Base */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f9;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+/* Mise en page principale */
+.content-wrapper {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    gap: 20px;
+}
+
+.sidebar {
+    flex: 0 0 300px; /* Largeur fixe pour le formulaire */
+}
+
+.dashboard-area {
+    flex-grow: 1; /* Prend l'espace restant pour le tableau de bord */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Erreur de validation (utilisée dans le formulaire) */
+.error {
+    color: red;
+    font-size: 0.8em;
+}

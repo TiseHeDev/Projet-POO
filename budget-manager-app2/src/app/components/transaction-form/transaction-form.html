@@ -1,0 +1,50 @@
+<section class="form-container">
+  <h3>➕ Nouvelle Transaction</h3>
+
+  <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    
+    <div class="form-group">
+      <label for="date">Date :</label>
+      <input id="date" type="date" formControlName="date" required>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Type :</label>
+      <select id="type" formControlName="type" required>
+        <option value="Dépense">Dépense ( - )</option>
+        <option value="Revenu">Revenu ( + )</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="amount">Montant (€) :</label>
+      <input id="amount" type="number" formControlName="amount" min="0.01" step="0.01" required placeholder="0.00">
+      <div *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched" class="error-message">
+        Montant requis et positif.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Catégorie :</label>
+      <select id="category" formControlName="category" required>
+        <option value="" disabled>Choisir ou entrer une catégorie...</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="method">Moyen de Paiement :</label>
+      <select id="method" formControlName="method" required>
+        <option value="" disabled>Choisir un moyen...</option>
+        <option *ngFor="let m of methods" [value]="m">{{ m }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description (optionnel) :</label>
+      <input id="description" type="text" formControlName="description">
+    </div>
+
+    <button type="submit" [disabled]="!transactionForm.valid">Enregistrer</button>
+  </form>
+</section>

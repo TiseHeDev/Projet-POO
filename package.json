@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@ngx-builders/pwa-local-storage": "^14.0.0",
+    "chart.js": "^4.5.1",
+    "ng2-charts": "^8.0.0"
+  }
+}
