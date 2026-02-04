@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { BudgetService } from '../../services/budget.service';
 import { Transaction } from '../../models/transaction.model';
 import { Observable, combineLatest, map } from 'rxjs';
+import { CashflowSankeyChartComponent } from '../../features/dashboard/cashflow-sankey-chart';
 
 // --- Imports et Initialisation pour le Graphique ---
 import { BaseChartDirective } from 'ng2-charts';
@@ -26,7 +27,7 @@ type SortDirection = 'asc' | 'desc' | '';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, BaseChartDirective], 
+  imports: [CommonModule, FormsModule, BaseChartDirective, CashflowSankeyChartComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

@@ -19,16 +19,13 @@ export class BudgetService {
   public categories$: Observable<string[]>;            
 
   constructor() {
-    // Les données démarrent à vide, prêtes pour l'importation JSON
     this.transactionsSubject = new BehaviorSubject<Transaction[]>([]);
     this.transactions$ = this.transactionsSubject.asObservable();
     
-    // Initialisation des catégories de base
     this.categoriesSubject = new BehaviorSubject<string[]>(DEFAULT_CATEGORIES);
     this.categories$ = this.categoriesSubject.asObservable();
   }
 
-  // Logique interne de mise à jour (remplace save/load du localStorage)
   private updateTransactions(transactions: Transaction[]): void {
     this.transactionsSubject.next(transactions);
   }
@@ -37,7 +34,6 @@ export class BudgetService {
       this.categoriesSubject.next(categories.sort()); 
   }
 
-  // Logique de gestion des catégories
   addCategory(categoryName: string): void {
       const currentCategories = this.categoriesSubject.getValue();
       const standardizedName = categoryName.trim();
@@ -55,11 +51,9 @@ export class BudgetService {
   }
 
   getAllCategories(): string[] {
-      // Les composants peuvent s'abonner à categories$ ou appeler cette méthode
       return this.categoriesSubject.getValue();
   }
   
-  // Logique CRUD des transactions
   addTransaction(transaction: Omit<Transaction, 'id'>): void {
     const currentTransactions = this.transactionsSubject.getValue();
     const newId = currentTransactions.length > 0
@@ -95,7 +89,6 @@ export class BudgetService {
       return this.transactionsSubject.getValue();
   }
 
-  // Importation JSON (Chargement des données)
   importTransactions(importedData: Transaction[]): void {
       const parsedTransactions = importedData.map(t => ({
           ...t,
@@ -107,7 +100,6 @@ export class BudgetService {
           id: t.id || index + 1
       }));
 
-      // Mise à jour des catégories lors de l'importation si de nouvelles sont détectées
       const newImportedCategories = updatedTransactions
           .map(t => t.category)
           .filter((cat, index, self) => self.indexOf(cat) === index);

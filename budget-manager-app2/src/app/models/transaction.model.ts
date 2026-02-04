@@ -3,9 +3,10 @@
 export interface Transaction {
   id: number;
   date: Date;
-  category: string; // Ex: 'Nourriture', 'Logement', 'Loisirs'
-  type: 'Revenu' | 'Dépense'; // Pour savoir si c'est un gain ou une perte
-  method: string; // Ex: 'Carte', 'Espèce', 'Virement'
+  category: string; 
+  parentCategory?: string; // Optionnel : pour le regroupement dans le diagramme de Sankey
+  type: 'Revenu' | 'Dépense'; 
+  method: string; 
   amount: number;
-  description?: string; // Optionnel
+  description?: string; 
 }

@@ -1,5 +1,4 @@
 <section class="dashboard-section">
-  <h2>📊 Aperçu du Budget</h2>
 
   <div class="balance-card" [ngClass]="getStatusClass(balanceStatus$ | async)">
     <p>Solde actuel (filtré) :</p>
@@ -87,31 +86,40 @@
       
       <div *ngIf="transactions.length === 0" class="data-warning card">
         <h3>⚠ Aucune donnée chargée</h3>
-        <p>Vos transactions ne sont pas sauvegardées localement. Veuillez utiliser le bouton **Importer les données** pour charger votre fichier JSON, ou commencer à ajouter de nouvelles transactions (qui ne seront pas sauvegardées après la fermeture du navigateur).</p>
+        <p>Vos transactions ne sont pas sauvegardées localement. Veuillez utiliser le bouton **Importer les données** pour charger votre fichier JSON, ou commencer à ajouter de nouvelles transactions.</p>
       </div>
       
-      <div class="chart-container card" *ngIf="transactions.length > 0"> 
-        <h3>📈 Évolution du Solde</h3>
+      <div *ngIf="transactions.length > 0">
         
-        <button (click)="toggleChart()" class="chart-toggle-button">
-            {{ showBalanceChart ? 'Masquer le Graphique' : 'Afficher le Graphique' }}
-        </button>
-
-        <div *ngIf="showBalanceChart" class="graph-area">
-            <ng-container *ngIf="lineChartData as chartData">
-                <div *ngIf="chartData.labels!.length > 0">
-                    <canvas baseChart
-                        [data]="chartData"
-                        [options]="lineChartOptions"
-                        [type]="lineChartType">
-                    </canvas>
-                </div>
-                
-                <div *ngIf="chartData.labels!.length === 0" class="no-data">
-                    Pas assez de données pour afficher le graphique.
-                </div>
-            </ng-container>
+        <div class="chart-container card" style="margin-bottom: 20px;">
+            <h3>🌊 Flux de Trésorerie</h3>
+            <app-cashflow-sankey-chart [transactions]="transactions"></app-cashflow-sankey-chart>
         </div>
+
+        <div class="chart-container card"> 
+            <h3>📈 Évolution du Solde</h3>
+            
+            <button (click)="toggleChart()" class="chart-toggle-button">
+                {{ showBalanceChart ? 'Masquer le Graphique' : 'Afficher le Graphique' }}
+            </button>
+
+            <div *ngIf="showBalanceChart" class="graph-area">
+                <ng-container *ngIf="lineChartData as chartData">
+                    <div *ngIf="chartData.labels!.length > 0">
+                        <canvas baseChart
+                            [data]="chartData"
+                            [options]="lineChartOptions"
+                            [type]="lineChartType">
+                        </canvas>
+                    </div>
+                    
+                    <div *ngIf="chartData.labels!.length === 0" class="no-data">
+                        Pas assez de données pour afficher le graphique.
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+
       </div>
       
       <h3>📜 Liste des Transactions ({{ transactions.length }} éléments)</h3>
@@ -182,5 +190,19 @@
           </tr>
         </tbody>
       </table>
+
   </ng-container>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 Sandri Mattéo | Marquis-Favre Anton</p>
+      <div class="footer-links">
+
+
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer-note">Fait avec <span style="color: #e25555;">&hearts;</span></p>
+    </div>
+  </footer>
+
 </section>
