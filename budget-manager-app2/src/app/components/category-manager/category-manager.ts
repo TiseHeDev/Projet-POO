@@ -1,10 +1,7 @@
-// src/app/components/category-manager/category-manager.ts
-
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BudgetService } from '../../services/budget.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-category-manager',
@@ -13,28 +10,26 @@ import { Observable } from 'rxjs';
   templateUrl: './category-manager.html',
   styleUrl: './category-manager.css'
 })
-export class CategoryManager implements OnInit {
-  categories$!: Observable<string[]>;
+export class CategoryManager {
+  // Injection publique pour le template
+  public budgetService = inject(BudgetService);
   
   newCategory: string = '';
+  newSubcategory: string = '';
+  selectedCategory: string = '';
   errorMessage: string | null = null;
   
-  constructor(private budgetService: BudgetService) {}
-
-  ngOnInit(): void {
-    this.categories$ = this.budgetService.categories$;
-  }
-
+  // Signal pour savoir quelle catégorie est en cours d'édition de sous-catégories
+  editingSubcategoriesFor = signal<string | null>(null);
+  
   addCategory(): void {
     if (!this.newCategory.trim()) {
       this.errorMessage = "La catégorie ne peut pas être vide.";
       return;
     }
     
-    const categoryName = this.newCategory.trim();
-    
     try {
-      this.budgetService.addCategory(categoryName);
+      this.budgetService.addCategory(this.newCategory.trim(), ['Général']);
       this.newCategory = '';
       this.errorMessage = null;
     } catch (error: any) {
@@ -43,12 +38,61 @@ export class CategoryManager implements OnInit {
   }
 
   deleteCategory(category: string): void {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer la catégorie "${category}" ? Cela ne supprimera PAS les transactions existantes qui l'utilisent.`)) {
+    if (confirm(`Supprimer la catégorie "${category}" et toutes ses sous-catégories ?`)) {
       try {
         this.budgetService.deleteCategory(category);
+        this.errorMessage = null;
       } catch (error: any) {
         this.errorMessage = error.message;
       }
     }
+  }
+
+  toggleSubcategoryEditor(categoryName: string): void {
+    const current = this.editingSubcategoriesFor();
+    if (current === categoryName) {
+      this.editingSubcategoriesFor.set(null);
+      this.selectedCategory = '';
+      this.newSubcategory = '';
+    } else {
+      this.editingSubcategoriesFor.set(categoryName);
+      this.selectedCategory = categoryName;
+      this.newSubcategory = '';
+    }
+  }
+
+  addSubcategory(): void {
+    if (!this.selectedCategory) {
+      this.errorMessage = "Veuillez sélectionner une catégorie.";
+      return;
+    }
+    
+    if (!this.newSubcategory.trim()) {
+      this.errorMessage = "La sous-catégorie ne peut pas être vide.";
+      return;
+    }
+    
+    try {
+      this.budgetService.addSubcategory(this.selectedCategory, this.newSubcategory.trim());
+      this.newSubcategory = '';
+      this.errorMessage = null;
+    } catch (error: any) {
+      this.errorMessage = error.message;
+    }
+  }
+
+  deleteSubcategory(categoryName: string, subcategoryName: string): void {
+    if (confirm(`Supprimer la sous-catégorie "${subcategoryName}" ?`)) {
+      try {
+        this.budgetService.deleteSubcategory(categoryName, subcategoryName);
+        this.errorMessage = null;
+      } catch (error: any) {
+        this.errorMessage = error.message;
+      }
+    }
+  }
+
+  getSubcategories(categoryName: string): string[] {
+    return this.budgetService.getSubcategories(categoryName);
   }
 }

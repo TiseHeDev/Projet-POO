@@ -18,11 +18,10 @@ header {
     padding: 15px 20px;
     text-align: center;
     
-    /* CORRECTION : Ajout du border-radius pour arrondir l'encart */
+    /* Arrondir le bas de l'en-tête */
     border-bottom-left-radius: 8px; 
     border-bottom-right-radius: 8px;
     
-    /* Retirer la marge en bas du header pour qu'il se colle au content-wrapper */
     margin-bottom: 0; 
 }
 
@@ -37,7 +36,7 @@ h1 {
     display: flex;
     flex-direction: column; 
     max-width: 1300px; 
-    margin: 20px auto; /* Ajout d'une marge en haut pour centrer le contenu sous le header */
+    margin: 20px auto; 
     padding: 0 15px;
     gap: 20px; 
     align-items: center; 
@@ -51,12 +50,10 @@ h1 {
     padding: 15px;
 }
 
-/* NOUVEAU: Conteneur du gestionnaire de catégories */
 .category-manager-area {
     width: 100%;
 }
 
-/* Bouton d'ajout de transaction (maintenant dans le Dashboard) */
 .top-actions {
     width: 100%;
     display: flex;
@@ -114,6 +111,12 @@ h1 {
     max-width: 450px; 
     width: 90%;
     position: relative; 
+    
+    /* --- CORRECTION POUR LE SCROLL --- */
+    max-height: 85vh; /* Hauteur max de 85% de la fenêtre */
+    overflow-y: auto; /* Ajoute une barre de défilement si le contenu dépasse */
+    display: flex;
+    flex-direction: column;
 }
 
 .large-modal {

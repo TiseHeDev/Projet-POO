@@ -6,23 +6,61 @@
     </div>
 
     <div class="add-category-form">
-        <input 
-            type="text" 
-            [(ngModel)]="newCategory" 
-            (keyup.enter)="addCategory()"
-            placeholder="Nom de la nouvelle catégorie"
-            maxlength="30"
-        >
-        <button (click)="addCategory()" [disabled]="!newCategory.trim()">Ajouter</button>
+        <h4>Ajouter une catégorie principale</h4>
+        <div class="input-group">
+            <input 
+                type="text" 
+                [(ngModel)]="newCategory" 
+                (keyup.enter)="addCategory()"
+                placeholder="Nom de la nouvelle catégorie"
+                maxlength="30"
+            >
+            <button (click)="addCategory()" [disabled]="!newCategory.trim()">+ Ajouter</button>
+        </div>
     </div>
 
     <div class="category-list-container">
-        <h4>Catégories existantes:</h4>
-        <ul *ngIf="categories$ | async as categories" class="category-list">
-            <li *ngFor="let cat of categories">
-                <span>{{ cat }}</span>
-                <button (click)="deleteCategory(cat)" class="delete-cat-button">X</button>
-            </li>
-        </ul>
+        <h4>Catégories et sous-catégories:</h4>
+        <div *ngFor="let catStructure of budgetService.categoryStructure()" class="category-item">
+            <div class="category-header">
+                <span class="category-name">📁 {{ catStructure.name }}</span>
+                <div class="category-actions">
+                    <button 
+                        (click)="toggleSubcategoryEditor(catStructure.name)" 
+                        class="manage-subcat-button"
+                        [class.active]="editingSubcategoriesFor() === catStructure.name">
+                        {{ editingSubcategoriesFor() === catStructure.name ? '−' : '+' }} Sous-catégories
+                    </button>
+                    <button (click)="deleteCategory(catStructure.name)" class="delete-cat-button">🗑️</button>
+                </div>
+            </div>
+
+            <!-- Liste des sous-catégories -->
+            <div class="subcategory-list" *ngIf="catStructure.subcategories.length > 0">
+                <div *ngFor="let subcat of catStructure.subcategories" class="subcategory-item">
+                    <span class="subcategory-name">└─ {{ subcat }}</span>
+                    <button 
+                        (click)="deleteSubcategory(catStructure.name, subcat)" 
+                        class="delete-subcat-button"
+                        title="Supprimer cette sous-catégorie">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Éditeur de sous-catégories -->
+            <div class="subcategory-editor" *ngIf="editingSubcategoriesFor() === catStructure.name">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        [(ngModel)]="newSubcategory" 
+                        (keyup.enter)="addSubcategory()"
+                        placeholder="Nouvelle sous-catégorie"
+                        maxlength="30"
+                    >
+                    <button (click)="addSubcategory()" [disabled]="!newSubcategory.trim()">+ Ajouter</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

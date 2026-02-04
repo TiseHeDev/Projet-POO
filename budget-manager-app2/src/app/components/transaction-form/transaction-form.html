@@ -26,10 +26,18 @@
     </div>
 
     <div class="form-group">
-      <label for="category">Catégorie :</label>
+      <label for="category">Catégorie principale :</label>
       <select id="category" formControlName="category" required>
         <option value="" disabled>Choisir une catégorie...</option>
-        <option *ngFor="let cat of (categories$ | async)" [value]="cat">{{ cat }}</option>
+        <option *ngFor="let cat of budgetService.categories()" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="transactionForm.get('category')?.value">
+      <label for="subcategory">Sous-catégorie :</label>
+      <select id="subcategory" formControlName="subcategory">
+        <option value="">Aucune / Général</option>
+        <option *ngFor="let subcat of availableSubcategories()" [value]="subcat">{{ subcat }}</option>
       </select>
     </div>
     
@@ -43,7 +51,7 @@
 
     <div class="form-group">
       <label for="description">Description (optionnel) :</label>
-      <input id="description" type="text" formControlName="description">
+      <input id="description" type="text" formControlName="description" placeholder="Ex: Courses de la semaine">
     </div>
 
     <div class="form-actions">

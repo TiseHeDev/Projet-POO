@@ -327,3 +327,74 @@ th:hover {
     color: #888;
     margin-top: 10px;
 }
+/* Styles pour les sous-catégories dans les tops */
+.subcategory-badge {
+    display: inline-block;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.top-item-card ul li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.top-item-card ul li .amount {
+    margin-left: auto;
+}
+
+/* Styles pour les sous-catégories dans le tableau */
+.subcategory-tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #555;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.subcategory-empty {
+    color: #ccc;
+    font-style: italic;
+}
+
+/* Amélioration de la table pour supporter la nouvelle colonne */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 900px; /* Augmenté pour la colonne sous-catégorie */
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .top-item-card ul li {
+        font-size: 0.9rem;
+    }
+    
+    .subcategory-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    table {
+        font-size: 0.85rem;
+    }
+    
+    .subcategory-tag {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+    }
+}

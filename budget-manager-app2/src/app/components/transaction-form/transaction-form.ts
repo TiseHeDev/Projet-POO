@@ -1,116 +1,123 @@
-// src/app/components/transaction-form/transaction-form.ts
-
-import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { BudgetService } from '../../services/budget.service';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BudgetService } from '../../services/budget.service';
 import { Transaction } from '../../models/transaction.model';
-import { Observable } from 'rxjs'; 
 
 @Component({
   selector: 'app-transaction-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule], 
   templateUrl: './transaction-form.html',
-  styleUrl: './transaction-form.css'
+  styleUrls: ['./transaction-form.css']
 })
 export class TransactionForm implements OnInit, OnChanges {
-  transactionForm: FormGroup;
-
-  private BASE_METHODS: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque'];
-  
-  categories$!: Observable<string[]>; // Remplacé par Observable
-  methods: string[] = [];   
   
   @Input() transactionToEdit: Transaction | null = null;
-  @Output() formSubmitted = new EventEmitter<void>();
-  @Output() formCancelled = new EventEmitter<void>();
+  @Output() save = new EventEmitter<any>();
+  @Output() cancel = new EventEmitter<void>();
 
-  get isEditMode(): boolean {
-    return !!this.transactionToEdit;
-  }
+  // Injection du service
+  public budgetService = inject(BudgetService);
+  
+  // Le formulaire réactif
+  public transactionForm: FormGroup;
+  public isEditMode = false;
+  
+  // Liste des méthodes pour la boucle *ngFor
+  public methods: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque', 'Prélèvement'];
 
-  constructor(private fb: FormBuilder, private budgetService: BudgetService) {
+  // Computed pour les sous-catégories basées sur la catégorie sélectionnée
+  public availableSubcategories = computed(() => {
+    const selectedCategory = this.transactionForm?.get('category')?.value;
+    if (!selectedCategory) return [];
+    return this.budgetService.getSubcategories(selectedCategory);
+  });
+
+  constructor(private fb: FormBuilder) {
+    // Création du formulaire "Reactive" attendu par le HTML
     this.transactionForm = this.fb.group({
-      id: [null], 
+      id: [null],
       date: [new Date().toISOString().substring(0, 10), Validators.required],
       category: ['', Validators.required],
+      subcategory: [''],
       type: ['Dépense', Validators.required],
-      method: ['', Validators.required],
       amount: [null, [Validators.required, Validators.min(0.01)]],
+      method: ['Carte', Validators.required],
       description: ['']
     });
-  }
-  
-  ngOnInit(): void {
-    // Lie l'Observable du service à la propriété locale
-    this.categories$ = this.budgetService.categories$;
-    
-    this.updateMethods();
-  }
-  
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['transactionToEdit']) {
-      if (this.transactionToEdit) {
-        this.transactionForm.patchValue({
-          id: this.transactionToEdit.id,
-          date: this.transactionToEdit.date.toISOString().substring(0, 10),
-          category: this.transactionToEdit.category,
-          type: this.transactionToEdit.type,
-          method: this.transactionToEdit.method,
-          amount: this.transactionToEdit.amount,
-          description: this.transactionToEdit.description
-        });
-        this.updateMethods(); 
-      } else {
-        this.resetForm();
-      }
-    }
+
+    // Écouter les changements de catégorie pour réinitialiser la sous-catégorie
+    this.transactionForm.get('category')?.valueChanges.subscribe(() => {
+      this.transactionForm.patchValue({ subcategory: '' }, { emitEvent: false });
+    });
   }
 
-  private updateMethods(): void {
-      const existingMethods = this.budgetService.getAllMethods();
-      this.methods = [...new Set([...this.BASE_METHODS, ...existingMethods])].sort();
+  ngOnInit(): void {
+    // Plus besoin de s'abonner à un Observable, les signals sont synchrones
   }
-  
-  private resetForm(): void {
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['transactionToEdit'] && this.transactionToEdit) {
+      this.isEditMode = true;
+      // Remplissage du formulaire pour modification
+      this.transactionForm.patchValue({
+        ...this.transactionToEdit,
+        // Formatage de la date pour l'input HTML type="date"
+        date: new Date(this.transactionToEdit.date).toISOString().substring(0, 10),
+        subcategory: this.transactionToEdit.subcategory || ''
+      });
+    } else {
+      // Mode Ajout : Reset du formulaire
+      this.isEditMode = false;
       this.transactionForm.reset({
         date: new Date().toISOString().substring(0, 10),
         type: 'Dépense',
-        id: null
+        method: 'Carte',
+        subcategory: ''
       });
+    }
   }
 
   onSubmit(): void {
     if (this.transactionForm.valid) {
       const formValue = this.transactionForm.value;
-
+      
       const transactionData = {
-        id: formValue.id,
+        ...formValue,
+        // Conversion sécurisée
+        amount: Number(formValue.amount),
         date: new Date(formValue.date),
-        category: formValue.category,
-        type: formValue.type,
-        method: formValue.method,
-        amount: +formValue.amount,
-        description: formValue.description
+        subcategory: formValue.subcategory || undefined
       };
 
-      if (this.isEditMode) {
-        this.budgetService.updateTransaction(transactionData as Transaction);
-        alert('Transaction modifiée avec succès !');
-        this.formSubmitted.emit(); 
+      // En mode édition, on met à jour
+      if (this.isEditMode && this.transactionToEdit) {
+        this.budgetService.updateTransaction({
+          ...transactionData,
+          id: this.transactionToEdit.id
+        });
       } else {
+        // En mode ajout, on ajoute
         this.budgetService.addTransaction(transactionData);
-        alert('Transaction ajoutée !');
-        this.updateMethods(); 
       }
+
+      this.save.emit(transactionData);
       
-      this.resetForm();
+      // Reset propre après ajout
+      if (!this.isEditMode) {
+        this.transactionForm.reset({
+          date: new Date().toISOString().substring(0, 10),
+          type: 'Dépense',
+          method: 'Carte',
+          subcategory: ''
+        });
+      }
     }
   }
-  
+
   onCancel(): void {
-      this.resetForm();
-      this.formCancelled.emit();
+    this.cancel.emit();
+    this.transactionForm.reset();
   }
 }

@@ -53,7 +53,7 @@ Chart.register(SankeyController, Flow);
     }
     .chart-wrapper {
       position: relative;
-      height: 350px;
+      height: 450px;
       width: 100%;
     }
     .stats-bar {
@@ -116,8 +116,6 @@ export class CashflowSankeyChartComponent implements OnChanges {
         callbacks: {
           label: (context: any) => {
             const item = context.raw;
-            // On nettoie le label pour le tooltip (pour ne pas avoir le montant en double si on veut)
-            // Ici je laisse tel quel pour la simplicité, mais on pourrait parser
             return `${item.from} → ${item.to} : ${item.flow.toFixed(2)} €`;
           }
         }
@@ -131,65 +129,144 @@ export class CashflowSankeyChartComponent implements OnChanges {
     }
   }
 
-  private cleanLabel(label: string): string {
-    return label.replace('__IN', '').replace('__OUT', '');
-  }
-
   private updateChartData(): void {
     if (this.transactions.length === 0) return;
 
-    const incomeTotals: Record<string, number> = {};
-    const expenseTotals: Record<string, number> = {};
-    const nodeLabels: Record<string, string> = {}; 
+    // Structure hiérarchique: Catégorie -> Sous-catégorie
+    const incomeByCategory: Record<string, number> = {};
+    const incomeBySubcategory: Record<string, Record<string, number>> = {};
+    
+    const expenseByCategory: Record<string, number> = {};
+    const expenseBySubcategory: Record<string, Record<string, number>> = {};
+    
+    const nodeLabels: Record<string, string> = {};
 
     this.totalRevenus = 0;
     this.totalDepenses = 0;
     this.tauxEpargne = 0;
 
-    // 1. Calcul des sommes
+    // 1. Calcul des sommes par catégorie et sous-catégorie
     this.transactions.forEach(t => {
+      const subcat = t.subcategory || 'Général';
+      
       if (t.type === 'Revenu') {
-        incomeTotals[t.category] = (incomeTotals[t.category] || 0) + t.amount;
+        // Revenus par catégorie
+        incomeByCategory[t.category] = (incomeByCategory[t.category] || 0) + t.amount;
+        
+        // Revenus par sous-catégorie
+        if (!incomeBySubcategory[t.category]) {
+          incomeBySubcategory[t.category] = {};
+        }
+        incomeBySubcategory[t.category][subcat] = 
+          (incomeBySubcategory[t.category][subcat] || 0) + t.amount;
+        
         this.totalRevenus += t.amount;
       } else if (t.type === 'Dépense') {
-        expenseTotals[t.category] = (expenseTotals[t.category] || 0) + t.amount;
+        // Dépenses par catégorie
+        expenseByCategory[t.category] = (expenseByCategory[t.category] || 0) + t.amount;
+        
+        // Dépenses par sous-catégorie
+        if (!expenseBySubcategory[t.category]) {
+          expenseBySubcategory[t.category] = {};
+        }
+        expenseBySubcategory[t.category][subcat] = 
+          (expenseBySubcategory[t.category][subcat] || 0) + t.amount;
+        
         this.totalDepenses += t.amount;
       }
     });
 
-    // 2. Calcul du taux
+    // 2. Calcul du taux d'épargne
     const solde = this.totalRevenus - this.totalDepenses;
     this.tauxEpargne = this.totalRevenus > 0 ? (solde / this.totalRevenus) * 100 : 0;
 
     const dataPoints: Array<{ from: string, to: string, flow: number }> = [];
     const centralNode = 'Budget Total';
     
-    // Pour le nœud central, on garde juste le nom ou on peut aussi mettre le montant total
-    nodeLabels[centralNode] = 'Budget Total';
+    nodeLabels[centralNode] = `Budget Total\n${this.totalRevenus.toFixed(0)}€`;
 
-    // 3. Flux Entrants
-    Object.keys(incomeTotals).forEach(cat => {
-      const nodeId = cat + '__IN';
-      // MODIFICATION ICI : On ajoute le montant à la suite du nom
-      nodeLabels[nodeId] = `${cat} : ${incomeTotals[cat].toFixed(2)} €`;
+    // 3. Flux Entrants (3 niveaux: Sous-catégorie -> Catégorie -> Budget)
+    Object.keys(incomeByCategory).forEach(category => {
+      const categoryNodeId = `${category}__CAT_IN`;
+      const categoryTotal = incomeByCategory[category];
       
-      dataPoints.push({ from: nodeId, to: centralNode, flow: incomeTotals[cat] });
+      nodeLabels[categoryNodeId] = `${category}\n${categoryTotal.toFixed(0)}€`;
+      
+      // Flux: Catégorie -> Budget Central
+      dataPoints.push({ 
+        from: categoryNodeId, 
+        to: centralNode, 
+        flow: categoryTotal 
+      });
+
+      // Sous-catégories -> Catégorie
+      const subcats = incomeBySubcategory[category];
+      if (subcats) {
+        Object.keys(subcats).forEach(subcat => {
+          const subcatNodeId = `${category}__${subcat}__IN`;
+          const subcatAmount = subcats[subcat];
+          
+          nodeLabels[subcatNodeId] = `${subcat}\n${subcatAmount.toFixed(0)}€`;
+          
+          // Flux: Sous-catégorie -> Catégorie
+          dataPoints.push({ 
+            from: subcatNodeId, 
+            to: categoryNodeId, 
+            flow: subcatAmount 
+          });
+        });
+      }
     });
 
-    // 4. Flux Sortants
-    Object.keys(expenseTotals).forEach(cat => {
-      const nodeId = cat + '__OUT';
-      // MODIFICATION ICI : On ajoute le montant à la suite du nom
-      nodeLabels[nodeId] = `${cat} : ${expenseTotals[cat].toFixed(2)} €`;
+    // 4. Flux Sortants (3 niveaux: Budget -> Catégorie -> Sous-catégorie)
+    Object.keys(expenseByCategory).forEach(category => {
+      const categoryNodeId = `${category}__CAT_OUT`;
+      const categoryTotal = expenseByCategory[category];
       
-      dataPoints.push({ from: centralNode, to: nodeId, flow: expenseTotals[cat] });
+      nodeLabels[categoryNodeId] = `${category}\n${categoryTotal.toFixed(0)}€`;
+      
+      // Flux: Budget Central -> Catégorie
+      dataPoints.push({ 
+        from: centralNode, 
+        to: categoryNodeId, 
+        flow: categoryTotal 
+      });
+
+      // Catégorie -> Sous-catégories
+      const subcats = expenseBySubcategory[category];
+      if (subcats) {
+        Object.keys(subcats).forEach(subcat => {
+          const subcatNodeId = `${category}__${subcat}__OUT`;
+          const subcatAmount = subcats[subcat];
+          
+          nodeLabels[subcatNodeId] = `${subcat}\n${subcatAmount.toFixed(0)}€`;
+          
+          // Flux: Catégorie -> Sous-catégorie
+          dataPoints.push({ 
+            from: categoryNodeId, 
+            to: subcatNodeId, 
+            flow: subcatAmount 
+          });
+        });
+      }
     });
 
-    // 5. Couleurs
+    // 5. Couleurs par niveau
     const getColor = (nodeId: string) => {
-      if (nodeId === centralNode) return '#2196F3'; 
-      if (nodeId.includes('__IN')) return '#4CAF50'; 
-      if (nodeId.includes('__OUT')) return '#F44336'; 
+      if (nodeId === centralNode) return '#2196F3'; // Bleu pour le centre
+      
+      // Revenus (vert avec nuances)
+      if (nodeId.includes('__IN')) {
+        if (nodeId.includes('__CAT_IN')) return '#28a745'; // Catégories revenus (vert foncé)
+        return '#5cb85c'; // Sous-catégories revenus (vert clair)
+      }
+      
+      // Dépenses (rouge avec nuances)
+      if (nodeId.includes('__OUT')) {
+        if (nodeId.includes('__CAT_OUT')) return '#dc3545'; // Catégories dépenses (rouge foncé)
+        return '#f86c6b'; // Sous-catégories dépenses (rouge clair)
+      }
+      
       return '#888888';
     };
 
@@ -203,7 +280,11 @@ export class CashflowSankeyChartComponent implements OnChanges {
           colorTo: (c: any) => getColor(c.raw.to),
           colorMode: 'gradient',
           borderWidth: 0,
-          font: { size: 12, weight: 'bold' }
+          font: { size: 11, weight: 'bold' },
+          size: 'max',
+          priority: {
+            [centralNode]: 100
+          }
         } as any
       ]
     };
