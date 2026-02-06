@@ -1,9 +1,3 @@
-Voici une proposition de fichier `README.md` complet, professionnel et adapté aux fonctionnalités spécifiques de votre code (notamment l'utilisation des **Signals**, du **Sankey Chart** et de la gestion des **sous-catégories**).
-
-Vous pouvez copier ce contenu directement dans un fichier nommé `README.md` à la racine de votre projet.
-
----
-
 # 📊 Gestionnaire de Budget (Angular)
 
 Application moderne de gestion de finances personnelles développée avec **Angular 16+**. Ce projet permet de suivre les revenus et dépenses, de visualiser les flux d'argent via des graphiques interactifs et de gérer un budget personnalisé avec un système de catégories et sous-catégories.
