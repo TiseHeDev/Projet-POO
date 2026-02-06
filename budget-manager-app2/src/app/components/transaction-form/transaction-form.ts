@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, inject, computed } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BudgetService } from '../../services/budget.service';
@@ -27,11 +27,14 @@ export class TransactionForm implements OnInit, OnChanges {
   // Liste des méthodes pour la boucle *ngFor
   public methods: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque', 'Prélèvement'];
 
-  // Computed pour les sous-catégories basées sur la catégorie sélectionnée
+  // Signal pour forcer la réactivité
+  private selectedCategorySignal = signal<string>('');
+
+  // Computed basé sur le signal pour forcer la mise à jour
   public availableSubcategories = computed(() => {
-    const selectedCategory = this.transactionForm?.get('category')?.value;
-    if (!selectedCategory) return [];
-    return this.budgetService.getSubcategories(selectedCategory);
+    const category = this.selectedCategorySignal();
+    if (!category) return [];
+    return this.budgetService.getSubcategories(category);
   });
 
   constructor(private fb: FormBuilder) {
@@ -47,36 +50,61 @@ export class TransactionForm implements OnInit, OnChanges {
       description: ['']
     });
 
-    // Écouter les changements de catégorie pour réinitialiser la sous-catégorie
-    this.transactionForm.get('category')?.valueChanges.subscribe(() => {
+    // Écouter les changements de catégorie
+    this.transactionForm.get('category')?.valueChanges.subscribe((newCategory) => {
+      // Mettre à jour le signal pour déclencher le computed
+      this.selectedCategorySignal.set(newCategory || '');
+      
+      // Reset de la sous-catégorie
       this.transactionForm.patchValue({ subcategory: '' }, { emitEvent: false });
     });
   }
 
   ngOnInit(): void {
-    // Plus besoin de s'abonner à un Observable, les signals sont synchrones
+    // Initialiser le signal avec la valeur actuelle
+    const initialCategory = this.transactionForm.get('category')?.value;
+    if (initialCategory) {
+      this.selectedCategorySignal.set(initialCategory);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['transactionToEdit'] && this.transactionToEdit) {
       this.isEditMode = true;
+      
       // Remplissage du formulaire pour modification
+      const categoryValue = this.transactionToEdit.category;
+      
       this.transactionForm.patchValue({
         ...this.transactionToEdit,
-        // Formatage de la date pour l'input HTML type="date"
         date: new Date(this.transactionToEdit.date).toISOString().substring(0, 10),
         subcategory: this.transactionToEdit.subcategory || ''
       });
+      
+      // Mettre à jour le signal avec la catégorie de la transaction
+      this.selectedCategorySignal.set(categoryValue);
     } else {
       // Mode Ajout : Reset du formulaire
       this.isEditMode = false;
-      this.transactionForm.reset({
-        date: new Date().toISOString().substring(0, 10),
-        type: 'Dépense',
-        method: 'Carte',
-        subcategory: ''
-      });
+      this.resetForm();
     }
+  }
+
+  resetForm(): void {
+    // Reset complet du formulaire
+    this.transactionForm.reset({
+      date: new Date().toISOString().substring(0, 10),
+      type: 'Dépense',
+      method: 'Carte',
+      category: '',
+      subcategory: '',
+      description: '',
+      amount: null,
+      id: null
+    });
+    
+    // CRUCIAL : Réinitialiser le signal pour vider les sous-catégories
+    this.selectedCategorySignal.set('');
   }
 
   onSubmit(): void {
@@ -104,20 +132,18 @@ export class TransactionForm implements OnInit, OnChanges {
 
       this.save.emit(transactionData);
       
-      // Reset propre après ajout
+      // Reset complet après ajout (pas en mode édition)
       if (!this.isEditMode) {
-        this.transactionForm.reset({
-          date: new Date().toISOString().substring(0, 10),
-          type: 'Dépense',
-          method: 'Carte',
-          subcategory: ''
-        });
+        // Utiliser setTimeout pour s'assurer que le reset se fait après l'émission
+        setTimeout(() => {
+          this.resetForm();
+        }, 0);
       }
     }
   }
 
   onCancel(): void {
     this.cancel.emit();
-    this.transactionForm.reset();
+    this.resetForm();
   }
 }

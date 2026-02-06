@@ -1,28 +1,45 @@
+/* Gestionnaire de catégories propre */
 .category-manager-card {
-    padding: 20px;
+    padding: 28px;
+    background: white;
 }
 
+.category-manager-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* Messages d'erreur */
 .error-message {
-    background-color: #fee;
-    color: #c33;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    border-left: 3px solid #c33;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border-left: 4px solid #dc2626;
+    font-weight: 500;
 }
 
+/* Section ajout de catégorie */
 .add-category-form {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #eee;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
 }
 
 .add-category-form h4 {
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 700;
 }
 
+/* Groupe d'input */
 .input-group {
     display: flex;
     gap: 10px;
@@ -31,155 +48,174 @@
 
 .input-group input {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    color: #1a202c;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .input-group button {
-    padding: 10px 20px;
-    background-color: #28a745;
+    padding: 12px 24px;
+    background: #10b981;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
 }
 
 .input-group button:hover:not(:disabled) {
-    background-color: #218838;
+    background: #059669;
+    transform: translateY(-2px);
 }
 
 .input-group button:disabled {
-    background-color: #ccc;
+    background: #d1d5db;
     cursor: not-allowed;
 }
 
+/* Liste de catégories */
 .category-list-container h4 {
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 1rem;
+    margin-bottom: 16px;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 700;
 }
 
+/* Item de catégorie */
 .category-item {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    margin-bottom: 16px;
+    border-radius: 12px;
     overflow: hidden;
-    background-color: #fafafa;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
 }
 
+/* Header de catégorie */
 .category-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 16px 20px;
+    background: #667eea;
 }
 
 .category-name {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
-    color: #333;
+    color: white;
 }
 
+/* Actions de catégorie */
 .category-actions {
     display: flex;
     gap: 8px;
 }
 
 .manage-subcat-button {
-    padding: 6px 12px;
-    background-color: #007bff;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
     color: white;
-    border: none;
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.85rem;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .manage-subcat-button:hover {
-    background-color: #0056b3;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .manage-subcat-button.active {
-    background-color: #dc3545;
-}
-
-.manage-subcat-button.active:hover {
-    background-color: #c82333;
+    background: #ef4444;
+    border-color: transparent;
 }
 
 .delete-cat-button {
-    padding: 6px 10px;
-    background-color: #dc3545;
+    padding: 8px 14px;
+    background: #ef4444;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
 .delete-cat-button:hover {
-    background-color: #c82333;
+    background: #dc2626;
+    transform: translateY(-2px);
 }
 
+/* Liste de sous-catégories */
 .subcategory-list {
-    padding: 10px 15px 10px 30px;
-    background-color: white;
+    padding: 16px 20px;
+    background: #f9fafb;
 }
 
 .subcategory-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
 }
 
 .subcategory-item:hover {
-    background-color: #f0f0f0;
+    background: #f0f9ff;
+    transform: translateX(6px);
+}
+
+.subcategory-item:last-child {
+    margin-bottom: 0;
 }
 
 .subcategory-name {
-    color: #555;
-    font-size: 0.9rem;
+    color: #374151;
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .delete-subcat-button {
-    padding: 4px 8px;
-    background-color: transparent;
-    color: #999;
-    border: none;
-    border-radius: 3px;
+    padding: 4px 10px;
+    background: transparent;
+    color: #9ca3af;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .delete-subcat-button:hover {
-    background-color: #fee;
-    color: #dc3545;
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #ef4444;
 }
 
+/* Éditeur de sous-catégories */
 .subcategory-editor {
-    padding: 15px;
-    background-color: #f0f8ff;
-    border-top: 1px solid #d0e8ff;
+    padding: 20px;
+    background: #eff6ff;
+    border-top: 1px solid #dbeafe;
 }
 
 .subcategory-editor .input-group input {
@@ -187,15 +223,33 @@
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    .category-manager-card {
+        padding: 20px;
+    }
+    
     .category-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 10px;
+        padding: 14px 16px;
     }
     
     .category-actions {
         width: 100%;
-        justify-content: flex-end;
+        flex-direction: column;
+    }
+    
+    .manage-subcat-button,
+    .delete-cat-button {
+        width: 100%;
+    }
+    
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .input-group button {
+        width: 100%;
     }
 }

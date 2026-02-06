@@ -1,148 +1,211 @@
-/* src/app/app.css */
+/* Import de la police moderne */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* APPLICATION DE LA POLICE SUR TOUS LES ÉLÉMENTS DE L'APPLICATION */
-:root, body, app-root, * {
-    font-family: 'Roboto', sans-serif !important;
-}
-
-/* Global Reset/Base */
-body {
+/* Reset et base */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: #f4f7f9;
 }
 
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f3f4f6;
+    color: #1a202c;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Header propre */
 header {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 15px 20px;
+    padding: 20px 32px;
     text-align: center;
-    
-    /* Arrondir le bas de l'en-tête */
-    border-bottom-left-radius: 8px; 
-    border-bottom-right-radius: 8px;
-    
-    margin-bottom: 0; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
     margin: 0;
-    font-size: 1.8em;
-    font-weight: 500;
 }
 
-/* Mise en page principale */
+/* Conteneur principal */
 .content-wrapper {
-    display: flex;
-    flex-direction: column; 
-    max-width: 1300px; 
-    margin: 20px auto; 
-    padding: 0 15px;
-    gap: 20px; 
-    align-items: center; 
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
 }
 
+/* Dashboard area */
 .dashboard-area {
-    width: 100%;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 24px;
+    margin-bottom: 24px;
 }
 
-.category-manager-area {
-    width: 100%;
-}
-
+/* Boutons principaux */
 .top-actions {
-    width: 100%;
     display: flex;
-    justify-content: flex-start; 
-    gap: 15px; 
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.add-transaction-button,
+.manage-category-button {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .add-transaction-button {
-    background-color: #28a745; 
+    background: #10b981;
     color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s;
+}
+
+.add-transaction-button:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .manage-category-button {
-    background-color: #6c757d; 
+    background: #6366f1;
     color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s;
 }
 
+.manage-category-button:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
 
-/* --- Styles de la Modale (Pop-up Centré) --- */
-
+/* Modales propres */
 .modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); 
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; 
+    z-index: 2000;
 }
 
 .modal-content {
     background: white;
-    padding: 0; 
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    max-width: 450px; 
-    width: 90%;
-    position: relative; 
-    
-    /* --- CORRECTION POUR LE SCROLL --- */
-    max-height: 85vh; /* Hauteur max de 85% de la fenêtre */
-    overflow-y: auto; /* Ajoute une barre de défilement si le contenu dépasse */
-    display: flex;
-    flex-direction: column;
+    border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
 }
 
 .large-modal {
-    max-width: 600px; 
+    max-width: 700px;
 }
 
+/* Bouton de fermeture */
 .close-modal {
     position: absolute;
-    top: 10px;
-    right: 10px; 
-    background: none;
+    top: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
-    font-size: 1.5em;
-    font-weight: 300;
-    color: #666;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #6b7280;
     cursor: pointer;
-    line-height: 1;
-    padding: 5px;
-    z-index: 1001; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
 }
 
 .close-modal:hover {
-    color: #333;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
+/* Scrollbar */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Messages d'erreur */
 .error {
-    color: red;
-    font-size: 0.8em;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    border-left: 4px solid #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header {
+        padding: 16px 20px;
+    }
+    
+    h1 {
+        font-size: 1.4rem;
+    }
+    
+    .content-wrapper {
+        padding: 16px;
+    }
+    
+    .dashboard-area {
+        padding: 20px;
+    }
+    
+    .top-actions {
+        flex-direction: column;
+    }
+    
+    .add-transaction-button,
+    .manage-category-button {
+        width: 100%;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+}
+
+/* Focus pour l'accessibilité */
+:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
 }
