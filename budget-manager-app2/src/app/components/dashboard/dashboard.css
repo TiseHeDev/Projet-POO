@@ -18,13 +18,13 @@ h3 {
 
 /* Cartes avec ombres subtiles */
 .card {
-    background: white;
+    background: rgb(255, 255, 255);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     padding: 24px;
     margin-bottom: 20px;
     transition: all 0.3s ease;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #d6e4f5;
 }
 
 .card:hover {
@@ -34,12 +34,12 @@ h3 {
 /* Carte de solde avec gradient subtil */
 .balance-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    color: rgb(255, 255, 255);
     border: none;
     padding: 32px;
     margin-bottom: 24px;
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0);
 }
 
 .balance-card p:first-child {

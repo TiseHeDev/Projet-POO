@@ -1,5 +1,7 @@
 <section class="dashboard-section">
-
+  <header>
+  <h1>📊 Gestionnaire de Budget</h1>
+</header>
   <div class="balance-card" [ngClass]="getStatusClass(balanceStatus())">
     <p>Solde actuel (filtré) :</p>
     <p class="balance-amount">{{ totalBalance() | number:'1.2-2' }} €</p>
