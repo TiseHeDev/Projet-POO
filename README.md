@@ -7,3 +7,4 @@ un dashboard (list  + graphs (camembert par type de dépense, le détail en pass
 on peut filtrer partout par mois, catégorie etc
 
 on peut utiliser local storage pour stocker les données (lib angular)
+<img width="1899" height="917" alt="image" src="https://github.com/user-attachments/assets/481e769d-32e6-48ef-8d3e-a82d75808634" />
