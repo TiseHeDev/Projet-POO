@@ -54,15 +54,14 @@ Ce projet utilise les dernières fonctionnalités du framework Angular :
 
 1. **Cloner le dépôt :**
 ```bash
-git clone https://github.com/votre-utilisateur/gestionnaire-budget.git
-cd gestionnaire-budget
+git clone *lien du repo*
 
 ```
 
 
 2. **Installer les dépendances :**
 ```bash
-npm install
+npm install *nom des dépendances*
 
 ```
 
