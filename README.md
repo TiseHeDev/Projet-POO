@@ -108,4 +108,4 @@ src/
 
 ---
 
-> Projet réalisé dans le cadre d'un module de développement Web Angular.
+> Projet réalisé dans le cadre d'un module de développement Web Angular en LP Sarii.
