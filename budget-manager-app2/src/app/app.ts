@@ -16,7 +16,7 @@ import { Transaction } from './models/transaction.model';
     TransactionForm, 
     Dashboard, 
     CategoryManager,
-    LabelManager  // NOUVEAU
+    LabelManager  // Gestion des labels
   ], 
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -27,7 +27,7 @@ export class App {
   transactionToEdit: Transaction | null = null;
   isModalOpen: boolean = false;
   isCategoryModalOpen: boolean = false;
-  isLabelModalOpen: boolean = false;  // NOUVEAU
+  isLabelModalOpen: boolean = false;  
   
   onEditRequest(transaction: Transaction): void {
     this.transactionToEdit = transaction;
@@ -52,7 +52,7 @@ export class App {
       this.isCategoryModalOpen = false;
   }
 
-  // NOUVEAU: Gestion modale labels
+  //Gestion modale labels
   openLabelModal(): void {
       this.isLabelModalOpen = true;
   }

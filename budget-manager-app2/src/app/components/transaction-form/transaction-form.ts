@@ -33,7 +33,7 @@ export class TransactionForm implements OnInit, OnChanges {
     return this.budgetService.getSubcategories(category);
   });
 
-  // NOUVEAU: Signal pour les labels sélectionnés
+  // Signal pour les labels sélectionnés
   public selectedLabels = signal<string[]>([]);
 
   constructor(private fb: FormBuilder) {
@@ -75,7 +75,7 @@ export class TransactionForm implements OnInit, OnChanges {
       
       this.selectedCategorySignal.set(categoryValue);
       
-      // NOUVEAU: Charger les labels existants
+      // Charger les labels existants
       this.selectedLabels.set(this.transactionToEdit.labels || []);
     } else {
       this.isEditMode = false;
@@ -96,10 +96,10 @@ export class TransactionForm implements OnInit, OnChanges {
     });
     
     this.selectedCategorySignal.set('');
-    this.selectedLabels.set([]);  // NOUVEAU: Reset des labels
+    this.selectedLabels.set([]);  // Reset des labels
   }
 
-  // NOUVEAU: Gestion des labels
+  // Gestion des labels
   toggleLabel(labelName: string): void {
     const current = this.selectedLabels();
     if (current.includes(labelName)) {

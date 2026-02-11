@@ -36,7 +36,7 @@ export class LabelManager {
     '#06b6d4'  // Cyan
   ];
   
-  // Emojis prédéfinis
+  // Emojis par défaut pour les labels
   predefinedEmojis: string[] = [
     '✈️', '🎂', '🎄', '💍', '🚨', '🏖️', '🎓', '💼', 
     '🏥', '🚗', '🏠', '🎮', '🎭', '🎵', '📚', '⚽'

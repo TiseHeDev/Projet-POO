@@ -62,7 +62,7 @@ export class Dashboard {
         list = list.filter(t => t.category === cat);
     }
 
-    // NOUVEAU: Filtrage par label
+    // Filtrage par label
     const label = this.selectedLabel();
     if (label) {
         list = list.filter(t => t.labels?.includes(label));
@@ -156,13 +156,13 @@ export class Dashboard {
   @Output() editTransaction = new EventEmitter<Transaction>();
   @Output() addTransaction = new EventEmitter<void>();
   @Output() manageCategories = new EventEmitter<void>();
-  @Output() manageLabels = new EventEmitter<void>();  // NOUVEAU
+  @Output() manageLabels = new EventEmitter<void>(); 
 
   constructor() {}
 
   updateMonth(val: string) { this.selectedMonth.set(val); }
   updateCategory(val: string) { this.selectedCategory.set(val); }
-  updateLabel(val: string) { this.selectedLabel.set(val); }  // NOUVEAU
+  updateLabel(val: string) { this.selectedLabel.set(val); } 
 
   setSort(column: SortColumn): void {
       if (this.currentSortColumn() === column) {
@@ -189,7 +189,7 @@ export class Dashboard {
     window.scrollTo(0, 0); 
   }
 
-  // NOUVEAU: Helpers pour afficher les labels
+  //Helpers pour afficher les labels
   getLabelColor(labelName: string): string {
     const label = this.budgetService.getLabelByName(labelName);
     return label?.color || '#6b7280';
@@ -239,7 +239,7 @@ export class Dashboard {
           ...t, 
           date: t.date.toISOString(),
           subcategory: t.subcategory || undefined,
-          labels: t.labels || []  // NOUVEAU
+          labels: t.labels || []  
       }));
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -268,5 +268,5 @@ export class Dashboard {
 
   openAddModal() { this.addTransaction.emit(); }
   openCategoryModal() { this.manageCategories.emit(); }
-  openLabelModal() { this.manageLabels.emit(); }  // NOUVEAU
+  openLabelModal() { this.manageLabels.emit(); } 
 }

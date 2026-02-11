@@ -35,7 +35,7 @@ export class BudgetService {
 
   constructor() {}
 
-  // ========== GESTION DES LABELS ==========
+  //               GESTION DES LABELS
 
   addLabel(label: Label): void {
     const currentLabels = this.labels();
@@ -92,7 +92,7 @@ export class BudgetService {
     return { expenses, revenues, balance: revenues - expenses };
   }
 
-  // ========== GESTION DES CATÉGORIES ==========
+  //              GESTION DES CATÉGORIES 
 
   addCategory(categoryName: string, subcategories: string[] = []): void {
     const currentStructure = this.categoryStructure();
@@ -185,7 +185,7 @@ export class BudgetService {
     return this.categories();
   }
   
-  // ========== GESTION DES TRANSACTIONS ==========
+  //                  GESTION DES TRANSACTIONS 
 
   addTransaction(transaction: Omit<Transaction, 'id'>): void {
     const currentTransactions = this.transactions();
@@ -217,7 +217,7 @@ export class BudgetService {
     return this.transactions();
   }
 
-  // ========== IMPORT / EXPORT ==========
+  //                IMPORT / EXPORT 
 
   importTransactions(importedData: any[]): void {
     const parsedTransactions = importedData.map(t => ({
@@ -243,7 +243,7 @@ export class BudgetService {
       }
     });
 
-    // NOUVEAU: Extraction des labels
+    //  Extraction des labels
     const labelSet = new Set<string>();
     updatedTransactions.forEach(t => {
       if (t.labels) {
