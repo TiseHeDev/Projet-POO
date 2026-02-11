@@ -5,6 +5,7 @@ Application moderne de gestion de finances personnelles développée avec **Angu
 ## ✨ Fonctionnalités Principales
 
 ### 🏠 Tableau de Bord (Dashboard)
+<img width="1201" height="736" alt="image" src="https://github.com/user-attachments/assets/0b3d8ca4-1582-4b85-b6da-dd7826cf0d32" />
 
 * **Vue d'ensemble en temps réel** : Calcul automatique du solde total, des entrées et des sorties.
 * **Indicateurs Visuels** : Alertes visuelles (Vert/Rouge) selon l'état du solde.
@@ -14,8 +15,11 @@ Application moderne de gestion de finances personnelles développée avec **Angu
 ### 📈 Visualisation de Données
 
 * **Diagramme de Sankey** : Visualisation unique des flux de trésorerie (Source → Destination) pour comprendre exactement où va l'argent.
-* **Graphique d'Évolution** : Courbe de suivi du solde cumulé dans le temps.
+<img width="1172" height="598" alt="image" src="https://github.com/user-attachments/assets/ed416db7-8434-4372-9864-e71c0b2ab612" />
 
+
+* **Graphique d'Évolution** : Courbe de suivi du solde cumulé dans le temps.
+<img width="1175" height="328" alt="image" src="https://github.com/user-attachments/assets/4d064dc6-cd4d-4f5e-b385-fac5bc13e505" />
 ### 📝 Gestion des Transactions
 
 * **CRUD Complet** : Ajouter, modifier et supprimer des transactions.
@@ -41,35 +45,6 @@ Ce projet utilise les dernières fonctionnalités du framework Angular :
 * **State Management** : **Angular Signals** (`signal`, `computed`, `update`) pour une réactivité optimale et sans `RxJS` complexe dans les vues.
 * **Graphiques** : `Chart.js` avec `ng2-charts` et le plugin `chartjs-chart-sankey`.
 * **Style** : CSS3 natif, Flexbox et Grid Layout, Responsive Design.
-
----
-
-## 🚀 Installation et Lancement
-
-1. **Cloner le dépôt :**
-```bash
-git clone *lien du repo*
-
-```
-
-
-2. **Installer les dépendances :**
-```bash
-npm install *nom des dépendances*
-
-```
-
-
-*Note : Assurez-vous d'avoir `chart.js` et `chartjs-chart-sankey` installés.*
-3. **Lancer le serveur de développement :**
-```bash
-ng serve
-
-```
-
-
-4. **Accéder à l'application :**
-Ouvrez votre navigateur sur `http://localhost:4200/`.
 
 ---
 
