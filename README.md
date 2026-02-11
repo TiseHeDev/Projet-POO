@@ -56,6 +56,7 @@ src/
 │   ├── components/
 │   │   ├── dashboard/           # Vue principale et graphiques
 │   │   ├── transaction-form/    # Formulaire d'ajout/modif (Reactive Forms)
+|   |   ├── label-manager/       # Arborescence pour la gestion des labels
 │   │   └── category-manager/    # Gestion des catégories/sous-catégories
 │   ├── features/
 │   │   └── dashboard/           # Composants spécifiques (Sankey Chart)
