@@ -1,0 +1,360 @@
+/* Gestionnaire de labels */
+.label-manager-card {
+    padding: 28px;
+    background: white;
+}
+
+.label-manager-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+}
+
+/* Messages d'erreur */
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border-left: 4px solid #dc2626;
+    font-weight: 500;
+}
+
+/* Formulaire d'ajout */
+.add-label-form {
+    margin-bottom: 28px;
+    padding: 24px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 12px;
+    border: 2px dashed #3b82f6;
+}
+
+.add-label-form h4 {
+    margin-bottom: 16px;
+    color: #1e40af;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.form-row {
+    margin-bottom: 16px;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.form-field input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    color: #1a202c;
+}
+
+.form-field input[type="text"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Sélecteur de couleurs */
+.color-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: #1a202c;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #1a202c;
+}
+
+/* Sélecteur d'emojis */
+.emoji-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.emoji-option {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emoji-option:hover {
+    background: #f3f4f6;
+    transform: scale(1.1);
+}
+
+.emoji-option.selected {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.emoji-input {
+    margin-top: 12px;
+    font-size: 1.2rem;
+}
+
+/* Bouton d'ajout */
+.add-button {
+    width: 100%;
+    padding: 14px 24px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+}
+
+.add-button:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.add-button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+/* Liste des labels */
+.label-list-container h4 {
+    margin-bottom: 16px;
+    color: #374151;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.no-labels {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 40px 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.label-item {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+}
+
+.label-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f9fafb;
+    border-left: 4px solid;
+}
+
+.label-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.label-icon {
+    font-size: 1.5rem;
+}
+
+.label-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #1a202c;
+}
+
+.label-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.label-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.stats-button {
+    padding: 8px 16px;
+    background: white;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.stats-button:hover {
+    background: #dbeafe;
+}
+
+.stats-button.active {
+    background: #3b82f6;
+    color: white;
+}
+
+.delete-label-button {
+    padding: 8px 14px;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.delete-label-button:hover {
+    background: #fef2f2;
+}
+
+/* Statistiques */
+.label-stats {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-card.expense {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+}
+
+.stat-card.revenue {
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+}
+
+.stat-card.balance {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+}
+
+.stat-card.balance.negative {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .label-manager-card {
+        padding: 20px;
+    }
+    
+    .label-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .label-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .label-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .stats-button,
+    .delete-label-button {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .color-selector,
+    .emoji-selector {
+        justify-content: center;
+    }
+}

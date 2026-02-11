@@ -1,0 +1,128 @@
+<div class="label-manager-card card">
+    <h3>🏷️ Gestion des Labels</h3>
+    <p class="subtitle">Créez des labels pour regrouper vos transactions par événements (vacances, anniversaire, etc.)</p>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="add-label-form">
+        <h4>Créer un nouveau label</h4>
+        
+        <div class="form-row">
+            <div class="form-field">
+                <label for="label-name">Nom du label :</label>
+                <input 
+                    id="label-name"
+                    type="text" 
+                    [(ngModel)]="newLabelName" 
+                    (keyup.enter)="addLabel()"
+                    placeholder="Ex: Vacances été 2026"
+                    maxlength="40"
+                >
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label>Couleur :</label>
+                <div class="color-selector">
+                    <button
+                        *ngFor="let color of predefinedColors"
+                        type="button"
+                        class="color-option"
+                        [class.selected]="selectedColor === color"
+                        [style.background-color]="color"
+                        (click)="selectColor(color)"
+                        [attr.aria-label]="'Choisir la couleur ' + color">
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label>Icône (optionnel) :</label>
+                <div class="emoji-selector">
+                    <button
+                        *ngFor="let emoji of predefinedEmojis"
+                        type="button"
+                        class="emoji-option"
+                        [class.selected]="newLabelIcon === emoji"
+                        (click)="selectEmoji(emoji)">
+                        {{ emoji }}
+                    </button>
+                </div>
+                <input 
+                    type="text" 
+                    [(ngModel)]="newLabelIcon" 
+                    placeholder="Ou saisissez un emoji"
+                    maxlength="2"
+                    class="emoji-input"
+                >
+            </div>
+        </div>
+
+        <button 
+            class="add-button" 
+            (click)="addLabel()" 
+            [disabled]="!newLabelName.trim()">
+            + Créer le label
+        </button>
+    </div>
+
+    <!-- Liste des labels existants -->
+    <div class="label-list-container">
+        <h4>Vos labels ({{ budgetService.labels().length }})</h4>
+        
+        <div *ngIf="budgetService.labels().length === 0" class="no-labels">
+            Aucun label créé pour le moment.
+        </div>
+
+        <div *ngFor="let label of budgetService.labels()" class="label-item">
+            <div class="label-header" [style.border-left-color]="label.color">
+                <div class="label-info">
+                    <span class="label-icon" *ngIf="label.icon">{{ label.icon }}</span>
+                    <span class="label-name">{{ label.name }}</span>
+                    <span 
+                        class="label-badge" 
+                        [style.background-color]="label.color">
+                        {{ getLabelStats(label.name).count }} transaction(s)
+                    </span>
+                </div>
+                <div class="label-actions">
+                    <button 
+                        (click)="toggleStats(label.name)" 
+                        class="stats-button"
+                        [class.active]="showingStatsFor() === label.name">
+                        📊 Stats
+                    </button>
+                    <button 
+                        (click)="deleteLabel(label.name)" 
+                        class="delete-label-button">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistiques du label -->
+            <div class="label-stats" *ngIf="showingStatsFor() === label.name">
+                <div class="stats-grid">
+                    <div class="stat-card expense">
+                        <span class="stat-label">Dépenses</span>
+                        <span class="stat-value">{{ getLabelStats(label.name).expenses | number:'1.2-2' }} €</span>
+                    </div>
+                    <div class="stat-card revenue">
+                        <span class="stat-label">Revenus</span>
+                        <span class="stat-value">{{ getLabelStats(label.name).revenues | number:'1.2-2' }} €</span>
+                    </div>
+                    <div class="stat-card balance" [class.negative]="getLabelStats(label.name).balance < 0">
+                        <span class="stat-label">Solde</span>
+                        <span class="stat-value">{{ getLabelStats(label.name).balance | number:'1.2-2' }} €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

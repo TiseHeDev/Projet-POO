@@ -4,13 +4,20 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionForm } from './components/transaction-form/transaction-form';
 import { Dashboard } from './components/dashboard/dashboard';
-import { CategoryManager } from './components/category-manager/category-manager'; 
+import { CategoryManager } from './components/category-manager/category-manager';
+import { LabelManager } from './components/label-manager/label-manager';  // NOUVEAU
 import { Transaction } from './models/transaction.model';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, TransactionForm, Dashboard, CategoryManager], 
+  imports: [
+    CommonModule, 
+    TransactionForm, 
+    Dashboard, 
+    CategoryManager,
+    LabelManager  // NOUVEAU
+  ], 
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -18,10 +25,10 @@ export class App {
   title = 'Gestionnaire de Budget';
   
   transactionToEdit: Transaction | null = null;
-  isModalOpen: boolean = false; // Modale de Transaction
-  isCategoryModalOpen: boolean = false; // NOUVEAU: Modale de Catégories
+  isModalOpen: boolean = false;
+  isCategoryModalOpen: boolean = false;
+  isLabelModalOpen: boolean = false;  // NOUVEAU
   
-  // Logique de Modale de Transaction (inchangée)
   onEditRequest(transaction: Transaction): void {
     this.transactionToEdit = transaction;
     this.isModalOpen = true; 
@@ -37,12 +44,20 @@ export class App {
       this.isModalOpen = true;
   }
   
-  // NOUVEAU: Logique de Modale de Catégories
   openCategoryModal(): void {
       this.isCategoryModalOpen = true;
   }
   
   closeCategoryModal(): void {
       this.isCategoryModalOpen = false;
+  }
+
+  // NOUVEAU: Gestion modale labels
+  openLabelModal(): void {
+      this.isLabelModalOpen = true;
+  }
+  
+  closeLabelModal(): void {
+      this.isLabelModalOpen = false;
   }
 }

@@ -38,9 +38,11 @@
             </div>
         </div>
 
-        <div class="add-button-container double-buttons">
+        <!-- NOUVEAU: Ajout du bouton Labels -->
+        <div class="add-button-container triple-buttons">
             <button class="add-transaction-button" (click)="openAddModal()">+ Ajouter</button>
             <button class="manage-category-button-in-grid" (click)="openCategoryModal()">⚙️ Catégories</button>
+            <button class="manage-labels-button-in-grid" (click)="openLabelModal()">🏷️ Labels</button>
         </div>
     </div>
     
@@ -60,6 +62,19 @@
                 (ngModelChange)="updateCategory($event)">
           <option value="">Toutes les catégories</option>
           <option *ngFor="let cat of allCategories()" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- NOUVEAU: Filtre par label -->
+      <div class="filter-group">
+        <label for="label-filter">Filtrer par Label :</label>
+        <select id="label-filter" 
+                [ngModel]="selectedLabel()" 
+                (ngModelChange)="updateLabel($event)">
+          <option value="">Tous les labels</option>
+          <option *ngFor="let label of budgetService.labels()" [value]="label.name">
+            <span *ngIf="label.icon">{{ label.icon }}</span> {{ label.name }}
+          </option>
         </select>
       </div>
       
@@ -116,6 +131,8 @@
               <th class="sortable-header" (click)="setSort('subcategory')">
                 Sous-cat. <span *ngIf="currentSortColumn() === 'subcategory'">{{ currentSortDirection() === 'asc' ? '↑' : '↓' }}</span>
               </th>
+              <!-- NOUVEAU: Colonne Labels -->
+              <th>Labels</th>
               <th class="sortable-header" (click)="setSort('type')">
                 Type <span *ngIf="currentSortColumn() === 'type'">{{ currentSortDirection() === 'asc' ? '↑' : '↓' }}</span>
               </th>
@@ -139,6 +156,19 @@
               <td>
                 <span *ngIf="t.subcategory" class="subcategory-tag">{{ t.subcategory }}</span>
                 <span *ngIf="!t.subcategory" class="subcategory-empty">—</span>
+              </td>
+              <!-- NOUVEAU: Affichage des labels -->
+              <td>
+                <div class="label-chips" *ngIf="t.labels && t.labels.length > 0">
+                  <span 
+                    *ngFor="let labelName of t.labels" 
+                    class="label-chip-small"
+                    [style.background-color]="getLabelColor(labelName)">
+                    <span *ngIf="getLabelIcon(labelName)">{{ getLabelIcon(labelName) }}</span>
+                    {{ labelName }}
+                  </span>
+                </div>
+                <span *ngIf="!t.labels || t.labels.length === 0" class="subcategory-empty">—</span>
               </td>
               <td>{{ t.type }}</td>
               <td>{{ t.method }}</td>

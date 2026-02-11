@@ -28,28 +28,25 @@ type SortDirection = 'asc' | 'desc' | '';
   styleUrl: './dashboard.css'
 })
 export class Dashboard {
-  // Injection du service
   public budgetService = inject(BudgetService);
 
-  // --- 1. ÉTATS LOCAUX (SIGNALS) ---
+  // États locaux
   selectedMonth = signal<string>(''); 
   selectedCategory = signal<string>('');
+  selectedLabel = signal<string>('');  // NOUVEAU
   
   currentSortColumn = signal<SortColumn>('date'); 
   currentSortDirection = signal<SortDirection>('desc'); 
 
   showBalanceChart = signal<boolean>(false);
 
-  // --- 2. DONNÉES DÉRIVÉES (COMPUTED) ---
-  
-  // Récupération des catégories (Signal)
   allCategories = this.budgetService.categories;
 
-  // Filtrage + Tri centralisés
+  // Filtrage avec label
   filteredTransactions = computed(() => {
-    let list = this.budgetService.transactions(); // Dépendance au service
+    let list = this.budgetService.transactions();
 
-    // A. Filtrage
+    // Filtrage par mois
     const month = this.selectedMonth();
     if (month) {
         const [year, m] = month.split('-');
@@ -59,12 +56,19 @@ export class Dashboard {
         );
     }
     
+    // Filtrage par catégorie
     const cat = this.selectedCategory();
     if (cat) {
         list = list.filter(t => t.category === cat);
     }
 
-    // B. Tri
+    // NOUVEAU: Filtrage par label
+    const label = this.selectedLabel();
+    if (label) {
+        list = list.filter(t => t.labels?.includes(label));
+    }
+
+    // Tri
     const col = this.currentSortColumn();
     const dir = this.currentSortDirection();
 
@@ -95,14 +99,12 @@ export class Dashboard {
     return list;
   });
 
-  // Calcul du solde
   totalBalance = computed(() => {
     return this.filteredTransactions().reduce((acc, t) => 
         acc + (t.type === 'Revenu' ? t.amount : -t.amount), 0
     );
   });
 
-  // Statut du solde
   balanceStatus = computed(() => {
     const bal = this.totalBalance();
     if (bal > 0) return 'vert';
@@ -110,14 +112,11 @@ export class Dashboard {
     return 'neutre';
   });
 
-  // Tops (mis à jour pour inclure les sous-catégories)
   top3Expenses = computed(() => this.getTopItems('Dépense'));
   top3Revenues = computed(() => this.getTopItems('Revenu'));
 
-  // Graphique (Se met à jour automatiquement quand filteredTransactions change)
   lineChartData = computed(() => {
       const transactions = this.filteredTransactions();
-      // Tri par date croissant pour le graph
       const sorted = [...transactions].sort((a, b) => a.date.getTime() - b.date.getTime());
       
       let cumulativeBalance = 0;
@@ -154,18 +153,16 @@ export class Dashboard {
   };
   public lineChartType: ChartType = 'line';
 
-  // --- OUTPUTS ---
   @Output() editTransaction = new EventEmitter<Transaction>();
   @Output() addTransaction = new EventEmitter<void>();
-  @Output() manageCategories = new EventEmitter<void>(); 
+  @Output() manageCategories = new EventEmitter<void>();
+  @Output() manageLabels = new EventEmitter<void>();  // NOUVEAU
 
   constructor() {}
 
-  // --- ACTIONS (UI) ---
-
-  // Setters pour les inputs (liés au ngModelChange dans le HTML)
   updateMonth(val: string) { this.selectedMonth.set(val); }
   updateCategory(val: string) { this.selectedCategory.set(val); }
+  updateLabel(val: string) { this.selectedLabel.set(val); }  // NOUVEAU
 
   setSort(column: SortColumn): void {
       if (this.currentSortColumn() === column) {
@@ -192,13 +189,21 @@ export class Dashboard {
     window.scrollTo(0, 0); 
   }
 
-  // --- HELPERS ---
+  // NOUVEAU: Helpers pour afficher les labels
+  getLabelColor(labelName: string): string {
+    const label = this.budgetService.getLabelByName(labelName);
+    return label?.color || '#6b7280';
+  }
+
+  getLabelIcon(labelName: string): string | undefined {
+    const label = this.budgetService.getLabelByName(labelName);
+    return label?.icon;
+  }
 
   private getTopItems(type: 'Revenu' | 'Dépense'): TopItem[] {
     const items = this.filteredTransactions().filter(t => t.type === type);
     const totals: Record<string, number> = {};
     
-    // Regrouper par catégorie + sous-catégorie
     items.forEach(t => {
       const key = t.subcategory 
         ? `${t.category} › ${t.subcategory}`
@@ -229,12 +234,12 @@ export class Dashboard {
       return 'status-neutre'; 
   }
 
-  // --- IMPORT / EXPORT ---
   exportData(): void {
       const data = this.budgetService.getAllTransactions().map(t => ({
           ...t, 
           date: t.date.toISOString(),
-          subcategory: t.subcategory || undefined
+          subcategory: t.subcategory || undefined,
+          labels: t.labels || []  // NOUVEAU
       }));
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -261,7 +266,7 @@ export class Dashboard {
       reader.readAsText(file);
   }
 
-  // Modales
   openAddModal() { this.addTransaction.emit(); }
   openCategoryModal() { this.manageCategories.emit(); }
+  openLabelModal() { this.manageLabels.emit(); }  // NOUVEAU
 }

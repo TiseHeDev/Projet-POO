@@ -54,6 +54,28 @@
       <input id="description" type="text" formControlName="description" placeholder="Ex: Courses de la semaine">
     </div>
 
+    <!-- NOUVEAU: Section Labels -->
+    <div class="form-group">
+      <label>🏷️ Labels (optionnel) :</label>
+      <div class="labels-selector">
+        <button
+          *ngFor="let label of budgetService.labels()"
+          type="button"
+          class="label-chip"
+          [class.selected]="isLabelSelected(label.name)"
+          [style.background-color]="isLabelSelected(label.name) ? label.color : 'transparent'"
+          [style.border-color]="label.color"
+          [style.color]="isLabelSelected(label.name) ? 'white' : label.color"
+          (click)="toggleLabel(label.name)">
+          <span *ngIf="label.icon">{{ label.icon }}</span>
+          {{ label.name }}
+        </button>
+      </div>
+      <p class="label-hint" *ngIf="selectedLabels().length > 0">
+        {{ selectedLabels().length }} label(s) sélectionné(s)
+      </p>
+    </div>
+
     <div class="form-actions">
         <button type="submit" [disabled]="!transactionForm.valid">
             {{ isEditMode ? 'Enregistrer les modifications' : 'Enregistrer' }}

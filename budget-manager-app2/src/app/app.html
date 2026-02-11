@@ -1,32 +1,42 @@
-
 <main class="content-wrapper">
-  
-
   
   <section class="dashboard-area full-width">
     <app-dashboard 
       (editTransaction)="onEditRequest($event)"
       (addTransaction)="onAddRequest()"
-      (manageCategories)="openCategoryModal()"> </app-dashboard>
+      (manageCategories)="openCategoryModal()"
+      (manageLabels)="openLabelModal()">
+    </app-dashboard>
   </section>
   
+  <!-- Modale Transaction -->
   <div class="modal-backdrop" *ngIf="isModalOpen">
     <div class="modal-content">
-      <button class="close-modal" (click)="clearEditState()">X</button>
+      <button class="close-modal" (click)="clearEditState()">✕</button>
       
       <app-transaction-form 
         [transactionToEdit]="transactionToEdit"
-        (formSubmitted)="clearEditState()"
-        (formCancelled)="clearEditState()">
+        (save)="clearEditState()"
+        (cancel)="clearEditState()">
       </app-transaction-form>
     </div>
   </div>
 
+  <!-- Modale Catégories -->
   <div class="modal-backdrop" *ngIf="isCategoryModalOpen">
     <div class="modal-content large-modal"> 
-      <button class="close-modal" (click)="closeCategoryModal()">X</button>
+      <button class="close-modal" (click)="closeCategoryModal()">✕</button>
       
       <app-category-manager></app-category-manager>
+    </div>
+  </div>
+
+  <!-- NOUVEAU: Modale Labels -->
+  <div class="modal-backdrop" *ngIf="isLabelModalOpen">
+    <div class="modal-content large-modal"> 
+      <button class="close-modal" (click)="closeLabelModal()">✕</button>
+      
+      <app-label-manager></app-label-manager>
     </div>
   </div>
   

@@ -69,7 +69,6 @@ select:hover {
     border-color: #9ca3af;
 }
 
-/* Placeholder */
 input::placeholder {
     color: #9ca3af;
 }
@@ -80,6 +79,43 @@ input::placeholder {
     font-size: 0.875rem;
     margin-top: 4px;
     font-weight: 500;
+}
+
+/* NOUVEAU: Sélecteur de labels */
+.labels-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.label-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.label-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.label-chip.selected {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.label-hint {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
 }
 
 /* Boutons du formulaire */
@@ -158,5 +194,9 @@ select {
     
     .form-actions button {
         width: 100%;
+    }
+    
+    .labels-selector {
+        justify-content: center;
     }
 }

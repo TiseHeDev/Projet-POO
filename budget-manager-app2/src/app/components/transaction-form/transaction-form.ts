@@ -17,28 +17,26 @@ export class TransactionForm implements OnInit, OnChanges {
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 
-  // Injection du service
   public budgetService = inject(BudgetService);
   
-  // Le formulaire réactif
   public transactionForm: FormGroup;
   public isEditMode = false;
   
-  // Liste des méthodes pour la boucle *ngFor
   public methods: string[] = ['Carte', 'Espèce', 'Virement', 'Chèque', 'Prélèvement'];
 
-  // Signal pour forcer la réactivité
+  // Signal pour forcer la réactivité de la catégorie
   private selectedCategorySignal = signal<string>('');
 
-  // Computed basé sur le signal pour forcer la mise à jour
   public availableSubcategories = computed(() => {
     const category = this.selectedCategorySignal();
     if (!category) return [];
     return this.budgetService.getSubcategories(category);
   });
 
+  // NOUVEAU: Signal pour les labels sélectionnés
+  public selectedLabels = signal<string[]>([]);
+
   constructor(private fb: FormBuilder) {
-    // Création du formulaire "Reactive" attendu par le HTML
     this.transactionForm = this.fb.group({
       id: [null],
       date: [new Date().toISOString().substring(0, 10), Validators.required],
@@ -50,18 +48,13 @@ export class TransactionForm implements OnInit, OnChanges {
       description: ['']
     });
 
-    // Écouter les changements de catégorie
     this.transactionForm.get('category')?.valueChanges.subscribe((newCategory) => {
-      // Mettre à jour le signal pour déclencher le computed
       this.selectedCategorySignal.set(newCategory || '');
-      
-      // Reset de la sous-catégorie
       this.transactionForm.patchValue({ subcategory: '' }, { emitEvent: false });
     });
   }
 
   ngOnInit(): void {
-    // Initialiser le signal avec la valeur actuelle
     const initialCategory = this.transactionForm.get('category')?.value;
     if (initialCategory) {
       this.selectedCategorySignal.set(initialCategory);
@@ -72,7 +65,6 @@ export class TransactionForm implements OnInit, OnChanges {
     if (changes['transactionToEdit'] && this.transactionToEdit) {
       this.isEditMode = true;
       
-      // Remplissage du formulaire pour modification
       const categoryValue = this.transactionToEdit.category;
       
       this.transactionForm.patchValue({
@@ -81,17 +73,17 @@ export class TransactionForm implements OnInit, OnChanges {
         subcategory: this.transactionToEdit.subcategory || ''
       });
       
-      // Mettre à jour le signal avec la catégorie de la transaction
       this.selectedCategorySignal.set(categoryValue);
+      
+      // NOUVEAU: Charger les labels existants
+      this.selectedLabels.set(this.transactionToEdit.labels || []);
     } else {
-      // Mode Ajout : Reset du formulaire
       this.isEditMode = false;
       this.resetForm();
     }
   }
 
   resetForm(): void {
-    // Reset complet du formulaire
     this.transactionForm.reset({
       date: new Date().toISOString().substring(0, 10),
       type: 'Dépense',
@@ -103,8 +95,22 @@ export class TransactionForm implements OnInit, OnChanges {
       id: null
     });
     
-    // CRUCIAL : Réinitialiser le signal pour vider les sous-catégories
     this.selectedCategorySignal.set('');
+    this.selectedLabels.set([]);  // NOUVEAU: Reset des labels
+  }
+
+  // NOUVEAU: Gestion des labels
+  toggleLabel(labelName: string): void {
+    const current = this.selectedLabels();
+    if (current.includes(labelName)) {
+      this.selectedLabels.set(current.filter(l => l !== labelName));
+    } else {
+      this.selectedLabels.set([...current, labelName]);
+    }
+  }
+
+  isLabelSelected(labelName: string): boolean {
+    return this.selectedLabels().includes(labelName);
   }
 
   onSubmit(): void {
@@ -113,28 +119,24 @@ export class TransactionForm implements OnInit, OnChanges {
       
       const transactionData = {
         ...formValue,
-        // Conversion sécurisée
         amount: Number(formValue.amount),
         date: new Date(formValue.date),
-        subcategory: formValue.subcategory || undefined
+        subcategory: formValue.subcategory || undefined,
+        labels: this.selectedLabels()  // NOUVEAU: Ajout des labels
       };
 
-      // En mode édition, on met à jour
       if (this.isEditMode && this.transactionToEdit) {
         this.budgetService.updateTransaction({
           ...transactionData,
           id: this.transactionToEdit.id
         });
       } else {
-        // En mode ajout, on ajoute
         this.budgetService.addTransaction(transactionData);
       }
 
       this.save.emit(transactionData);
       
-      // Reset complet après ajout (pas en mode édition)
       if (!this.isEditMode) {
-        // Utiliser setTimeout pour s'assurer que le reset se fait après l'émission
         setTimeout(() => {
           this.resetForm();
         }, 0);
